@@ -1,8 +1,9 @@
 const express = require('express');
 const cors = require('cors');
+require('dotenv').config();
 const adminRoutes = require('./routes/adminRoutes');
-// const dataRoutes = require('./routes/dataRoutes');
-// const feedbackRoutes = require('./routes/feedbackRoutes');
+const publicRoutes = require('./routes/publicRoutes');
+const authRoutes = require('./routes/authRoutes');
 
 const app = express();
 
@@ -11,8 +12,8 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
+app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
-// app.use('/api', dataRoutes);
-// app.use('/api/feedback', feedbackRoutes);
+app.use('/api/public', publicRoutes);
 
 module.exports = app;
