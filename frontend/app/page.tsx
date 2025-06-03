@@ -3,6 +3,8 @@ import SplitText from "@/Reactbits/SplitText/SplitText";
 import styles from "./page.module.css";
 import Magnet from "@/Reactbits/Magnet/Magnet";
 import AnimatedContent from "@/Reactbits/AnimatedContent/AnimatedContent";
+import ContributeSection from "@/components/ContributeSection";
+import Features from "@/components/Features";
 import Link from "next/link";
 
 export default function Home() {
@@ -52,6 +54,11 @@ export default function Home() {
           </Magnet>
         </AnimatedContent>
       </div>
+      <div className="flex items-center justify-center w-[100%] mt-[6rem] h-[100vh]">
+        {" "}
+        <Features />
+      </div>
+      <ContributeSection />
     </div>
   );
 }

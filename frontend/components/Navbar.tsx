@@ -3,7 +3,9 @@ import Link from "next/link";
 export default function Navbar() {
   return (
     <nav className="flex items-center justify-between p-6 text-white">
-      <div className="text-[2.5rem] font-[900]">CampusVault</div>
+      <Link href="/" className="text-[2.5rem] font-[900]">
+        CampusVault
+      </Link>
       <div className="flex space-x-10">
         <Link href="/login" className="hover:text-[var(--color-4)] transition-colors">
           Login
