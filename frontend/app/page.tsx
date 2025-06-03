@@ -10,12 +10,12 @@ import Link from "next/link";
 export default function Home() {
   return (
     <div className="flex flex-col items-center justify-center">
-      <div className="flex items-center justify-between w-[100%] mt-[6rem]">
+      <div className="flex items-center justify-between w-[100%] mb-[6rem] mt-[6rem]">
         <SplitText
           text="Your Central Hub for Semester-Wise Study Materials"
           className="text-[6rem] font-[800] tracking-[-0.3rem] leading-[5rem] w-[40rem] text-[var(--color-4)]"
           delay={100}
-          duration={0.9}
+          duration={1.4}
           ease="power3.out"
           splitType="words"
           from={{ opacity: 0, y: 40 }}
@@ -54,8 +54,7 @@ export default function Home() {
           </Magnet>
         </AnimatedContent>
       </div>
-      <div className="flex items-center justify-center w-[100%] mt-[6rem] h-[100vh]">
-        {" "}
+      <div className="flex items-center justify-center w-[100%] mt-[6rem] rounded-5xl">
         <Features />
       </div>
       <ContributeSection />

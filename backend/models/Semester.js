@@ -15,6 +15,11 @@ const semesterSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  other: [
+    {
+      type: String,
+    },
+  ],
   subjects: [
     {
       subjectId: {

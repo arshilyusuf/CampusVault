@@ -49,7 +49,7 @@ export default function ContributeSection() {
   }, []);
 
   return (
-    <div className="flex flex-col gap-10 items-center justify-center w-full mt-[6rem] h-[100vh]">
+    <div className="flex flex-col gap-10 items-center justify-center w-full mt-[6rem] h-[100vh] ">
       <div ref={textRef} className="opacity-0">
         <SplitText
           text="Want to contribute? Join us in building a comprehensive repository of semester-wise study materials!"

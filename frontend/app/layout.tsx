@@ -3,6 +3,7 @@ import {  Geist_Mono, Host_Grotesk } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Beams from "@/Reactbits/Beams/Beams";
+import Footer from "@/components/Footer";
 
 const hostGrotesk = Host_Grotesk({
   variable: "--font-geist-sans",
@@ -53,10 +54,9 @@ export default function RootLayout({
           />
         </div>
         <main>
-          {/* Background beams */}
-
           <Navbar />
           {children}
+          <Footer/>
         </main>
       </body>
     </html>
