@@ -3,7 +3,7 @@ import Link from "next/link";
 export default function Navbar() {
   return (
     <nav className="flex items-center justify-between p-6 text-white">
-      <Link href="/" className="text-[2.5rem] font-[900]">
+      <Link href="/" className="text-[2rem] font-[900]">
         CampusVault
       </Link>
       <div className="flex space-x-10">

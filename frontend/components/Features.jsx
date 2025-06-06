@@ -63,17 +63,14 @@ const spotlightItems = [
 
 export default function Features() {
   return (
-    
-      <InfiniteScroll
-        items={spotlightItems}
-        isTilted={true}
-        tiltDirection="left"
-        autoplay={true}
-        autoplaySpeed={0.1}
-        autoplayDirection="down"
-        pauseOnHover={true}
-        
-      />
-    
+    <InfiniteScroll
+      items={spotlightItems}
+      isTilted={true}
+      tiltDirection="left"
+      autoplay={true}
+      autoplaySpeed={0.1}
+      autoplayDirection="down"
+      pauseOnHover={true}
+    />
   );
 }
