@@ -7,10 +7,10 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-[80vh] flex items-center justify-center">
-      <form className="bg-white/80 dark:bg-black/30 shadow-xl rounded-2xl px-8 py-10 w-full max-w-md flex flex-col gap-6 backdrop-blur-md border border-[var(--color-3)]">
+      <form className="bg-black/50 dark:bg-black/30 shadow-xl rounded-2xl px-8 py-10 w-full max-w-md flex flex-col gap-6 border border-[var(--color-3)] [40px]">
         <h2 className="text-3xl font-bold text-center text-[var(--color-4)] mb-2">Admin Login</h2>
         <div className="flex flex-col gap-2">
-          <label htmlFor="email" className="text-sm font-medium text-[var(--color-1)] dark:text-[var(--color-4)]">Email</label>
+          <label htmlFor="email" className="text-sm font-medium text-[var(--color-4)] dark:text-[var(--color-4)]">Email</label>
           <input
             id="email"
             type="email"
@@ -22,7 +22,7 @@ export default function LoginPage() {
           />
         </div>
         <div className="flex flex-col gap-2">
-          <label htmlFor="password" className="text-sm font-medium text-[var(--color-1)] dark:text-[var(--color-4)]">Password</label>
+          <label htmlFor="password" className="text-sm font-medium text-[var(--color-4)] dark:text-[var(--color-4)]">Password</label>
           <input
             id="password"
             type="password"

@@ -33,33 +33,55 @@ const getSubjectsBySemester = async (req, res) => {
   try {
     const { branchName, semesterNumber } = req.params;
     if (!branchName || !semesterNumber) {
-      return res
-        .status(400)
-        .json({ message: "Branch name and semester number are required" });
+      return res.status(400).json({
+        message: "Branch name and semester number are required",
+      });
     }
-    const branch = await Branch.findOne({branchName });
+
+    const branch = await Branch.findOne({ branchName });
     if (!branch) {
       return res
         .status(404)
         .json({ message: `Branch '${branchName}' not found` });
     }
+
     const semester = await Semester.findOne({
       branchId: branch._id,
       semesterNumber: Number(semesterNumber),
     }).populate("subjects.subjectId");
+
     if (!semester) {
-      return res
-        .status(404)
-        .json({
-          message: `Semester ${semesterNumber} not found for branch '${branchName}'`,
-        });
+      return res.status(404).json({
+        message: `Semester ${semesterNumber} not found for branch '${branchName}'`,
+      });
     }
-    res.status(200).json({ subjects: semester.subjects });
+
+    const subjects = semester.subjects.map((s) => {
+      const subj = s.subjectId;
+      return {
+        _id: subj._id,
+        name: subj.name,
+        subjectName: subj.name,
+        semesterId: semester._id,
+        semesterNumber: semester.semesterNumber,
+        branchId: branch._id,
+        branchName: branch.branchName,
+        __v: subj.__v,
+        midsem: [],
+        endsem: [],
+        notes: [],
+        lectures: [],
+        other: [],
+      };
+    });
+
+    res.status(200).json({ subjects });
   } catch (err) {
     console.error("Error fetching subjects by semester:", err);
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
 const addSubjectToSemester = async (req, res) => {
   try {
     const { branchName, semesterNumber, subjectName } = req.body;
@@ -179,10 +201,54 @@ const uploadPdfToSubject = async (req, res) => {
   }
 };
 
+const getSubjectDetails = async (req, res) => {
+  try {
+    const { branchName, semesterNumber, subjectName } = req.params;
+
+    if (!branchName || !semesterNumber || !subjectName) {
+      return res.status(400).json({
+        message: "Branch name, semester number, and subject name are required",
+      });
+    }
+
+    const branch = await Branch.findOne({ branchName });
+    if (!branch) {
+      return res
+        .status(404)
+        .json({ message: `Branch '${branchName}' not found` });
+    }
+
+    const semester = await Semester.findOne({
+      branchId: branch._id,
+      semesterNumber: Number(semesterNumber),
+    });
+
+    if (!semester) {
+      return res.status(404).json({
+        message: `Semester ${semesterNumber} not found for branch '${branchName}'`,
+      });
+    }
+
+    const subject = await Subject.findOne({ name: subjectName });
+
+    if (!subject) {
+      return res
+        .status(404)
+        .json({ message: `Subject '${subjectName}' not found` });
+    }
+
+    res.status(200).json({ subject });
+  } catch (err) {
+    console.error("Error fetching subject details:", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 module.exports = {
   addBranch,
   getAllBranches,
   getSubjectsBySemester,
   addSubjectToSemester,
-  uploadPdfToSubject 
+  uploadPdfToSubject,
+  getSubjectDetails
 };

@@ -10,20 +10,35 @@ import Link from "next/link";
 export default function Home() {
   return (
     <div className="flex flex-col items-center justify-center">
-      <div className="flex items-center justify-between w-[100%] mb-[6rem] mt-[6rem]">
-        <SplitText
-          text="Your Central Hub for Semester-Wise Study Materials"
-          className="text-[6rem] font-[800] tracking-[-0.3rem] leading-[5rem] w-[40rem] text-[var(--color-4)]"
-          delay={100}
-          duration={1.4}
-          ease="power3.out"
-          splitType="words"
-          from={{ opacity: 0, y: 40 }}
-          to={{ opacity: 1, y: 0 }}
-          threshold={0.1}
-          rootMargin="-100px"
-          textAlign="left"
-        />
+      <div className="flex items-center justify-between mb-[6rem] mt-[6rem]">
+        <div className="flex flex-col items-start justify-center gap-10">
+          <SplitText
+            text="Your Central Hub for Semester-Wise Study Materials"
+            className="text-[6rem] font-[800] tracking-[-0.3rem] leading-[5rem] w-[40rem] text-[var(--color-4)]"
+            delay={100}
+            duration={1.4}
+            ease="power3.out"
+            splitType="words"
+            from={{ opacity: 0, y: 40 }}
+            to={{ opacity: 1, y: 0 }}
+            threshold={0.1}
+            rootMargin="-100px"
+            textAlign="left"
+          />
+          <SplitText
+            text="Find End Semesters, Mid Semesters, Class Lectures, notes, and more, all in one place!"
+            className="text-[1.2rem] font-[800] w-[60%] text-red-100"
+            delay={100}
+            duration={1.4}
+            ease="power3.out"
+            splitType="words"
+            from={{ opacity: 0, y: 40 }}
+            to={{ opacity: 1, y: 0 }}
+            threshold={0.1}
+            rootMargin="-100px"
+            textAlign="left"
+          />
+        </div>
         <AnimatedContent
           distance={150}
           direction="horizontal"

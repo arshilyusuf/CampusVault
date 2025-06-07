@@ -43,12 +43,12 @@ export default function RootLayout({
           }}
         >
           <Beams
-            beamWidth={2}
+            beamWidth={5}
             beamHeight={20}
             beamNumber={20}
             lightColor="#C60606"
             speed={2}
-            noiseIntensity={1.75}
+            noiseIntensity={1}
             scale={0.2}
             rotation={45}
           />

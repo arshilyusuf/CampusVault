@@ -1,9 +1,10 @@
 "use client";
 import { useState } from "react";
 import Button from "@/components/Button";
-
+import { useRouter } from "next/navigation";
+import { SearchIcon } from "@/components/ui/search";
 const branches = [
-  "Computer Science",
+  "Computer Science and Engineering",
   "Electronics",
   "Mechanical",
   "Civil",
@@ -12,25 +13,27 @@ const branches = [
   "Other",
 ];
 
-const semesters = ["1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th"];
+const semesters = ["1", "2", "3", "4", "5", "6", "7", "8"];
 
 export default function VaultPage() {
   const [branch, setBranch] = useState(branches[0]);
   const [semester, setSemester] = useState(semesters[0]);
+  const router = useRouter();
 
   return (
     <div className="flex flex-col items-center min-h-[80vh] py-12 gap-10">
       <h1 className="text-6xl md:text-7xl font-extrabold text-center text-[var(--color-4)] mb-4 tracking-tight drop-shadow-white">
         The Vault
       </h1>
-      <div className="p-10 bg-pink-100/10 rounded-3xl flex flex-col gap-3 backdrop-blur-2xl">
+      <div className="p-10 bg-black/20 rounded-3xl flex flex-col gap-3 backdrop-blur-2xl">
         <h2 className="text-2xl md:text-2xl font-bold text-center text-[#f2f2f2] tracking-tight">
           Search for your required material by your branch and semester
         </h2>
         <form
-          className="flex flex-col items-center justify-center gap-6 bg-white/10 p-8 rounded-xl shadow-lg"
+          className="flex  items-center justify-between gap-6 bg-black/40 p-8 rounded-xl shadow-lg"
           onSubmit={(e) => {
-            e.preventDefault(); /* handle search here */
+            e.preventDefault();
+            router.push(`/material/${encodeURIComponent(branch)}/${semester}`);
           }}
         >
           <div className="flex gap-4">
@@ -76,7 +79,7 @@ export default function VaultPage() {
             </div>
           </div>
           <div className="mt-4 md:mt-7">
-            <Button>Get Material</Button>
+            <Button><SearchIcon/></Button>
           </div>
         </form>
       </div>

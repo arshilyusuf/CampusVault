@@ -7,5 +7,9 @@ router.get(
   "/subjects/:branchName/:semesterNumber",
   adminController.getSubjectsBySemester
 );
+router.get(
+  "/subjects/:branchName/:semesterNumber/:subjectName",
+  adminController.getSubjectDetails
+);
 
 module.exports = router;
