@@ -56,8 +56,8 @@ const getSubjectsBySemester = async (req, res) => {
       });
     }
 
-    const subjects = semester.subjects.map((s) => {
-      const subj = s.subjectId;
+    const subjects = await Promise.all(semester.subjects.map(async (s) => {
+      const subj = await Subject.findById(s.subjectId);
       return {
         _id: subj._id,
         name: subj.name,
@@ -67,13 +67,13 @@ const getSubjectsBySemester = async (req, res) => {
         branchId: branch._id,
         branchName: branch.branchName,
         __v: subj.__v,
-        midsem: [],
-        endsem: [],
-        notes: [],
-        lectures: [],
-        other: [],
+        midsem: subj.midsem || [],
+        endsem: subj.endsem || [],
+        notes: subj.notes || [],
+        lectures: subj.lectures || [],
+        other: subj.other || [],
       };
-    });
+    }));
 
     res.status(200).json({ subjects });
   } catch (err) {

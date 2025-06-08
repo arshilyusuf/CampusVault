@@ -25,7 +25,7 @@ export default function PDFLink({ subject, uploadtype }) {
     <div className="border-b-2 border-gray-700 py-4">
       <span>{uploadTypeMap[uploadtype] || uploadtype}: </span>
       <div
-        className="text-xs text-gray-300 cursor-pointer flex items-center"
+        className="text-xs text-[var(--color-3)] cursor-pointer flex items-center"
         onClick={handleContribute}
       >
         <FaPlus className="mr-1" />
