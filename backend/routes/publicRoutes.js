@@ -1,15 +1,14 @@
 const express = require("express");
 const router = express.Router();
-const adminController = require("../controllers/adminController");
+const publicController = require("../controllers/publicController");
 
-router.get("/branches", adminController.getAllBranches);
 router.get(
   "/subjects/:branchName/:semesterNumber",
-  adminController.getSubjectsBySemester
+  publicController.getSubjectsBySemester
 );
 router.get(
   "/subjects/:branchName/:semesterNumber/:subjectName",
-  adminController.getSubjectDetails
+  publicController.getSubjectDetails
 );
 
 module.exports = router;
