@@ -7,7 +7,6 @@ const semesterSchema = new mongoose.Schema({
     required: true,
   },
   branchName: {
-    // Added branchName field
     type: String,
     required: true,
   },

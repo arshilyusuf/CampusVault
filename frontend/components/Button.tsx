@@ -3,11 +3,13 @@ export default function Button({
   onClick,
   buttonClassName = "",
   disabled = false,
+  type = "button",
 }: {
   children: React.ReactNode;
   onClick: () => void;
   buttonClassName?: string;
   disabled?: boolean;
+  type?: "button" | "submit" | "reset";
 }) {
   return (
     <div className={`relative w-fit h-fit ${buttonClassName}`}>
@@ -23,6 +25,7 @@ export default function Button({
               ${disabled ? "opacity-50 cursor-not-allowed translate-x-1 translate-y-1" : ""}`}
         onClick={onClick}
         disabled={disabled}
+        type={type}
       >
         {children}
       </button>
