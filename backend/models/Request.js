@@ -7,7 +7,7 @@ const RequestSchema = new mongoose.Schema(
         subjectName: { type: String, required: true },
         uploadType: { type: String, required: true },
         requestingUser: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-        status: { type: String, enum: ['pending', 'approved', 'rejected', 'uploaded'], default: 'pending' },
+        status: { type: String, enum: ['pending', 'rejected', 'uploaded'], default: 'pending' },
     },
     { timestamps: true }
 );

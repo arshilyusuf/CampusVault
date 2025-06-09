@@ -1,89 +1,82 @@
 const jwt = require("jsonwebtoken");
-const Admin = require("../models/Admin");
+const User = require("../models/User");
 
-const register = async (req, res) => {
-  try {
-    const { password, email, name, branchName, yearNumber } = req.body;
-
-    const adminExists = await Admin.findOne({ email });
-    if (adminExists) {
-      return res.status(400).json({ message: "Admin already exists" });
-    }
-
-    const admin = await Admin.create({
-      password,
-      email,
-      name,
-      branchName,
-      yearNumber,
-    });
-
-    const token = jwt.sign(
-      { id: admin._id, role: admin.role },
-      process.env.JWT_SECRET,
-      { expiresIn: "1d" }
-    );
-
-    res.status(201).json({
-      message: "Admin registered successfully",
-      token,
-    });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
 
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const admin = await Admin.findOne({ email });
-    if (!admin) {
+    const user = await User.findOne({ email });
+    if (!user) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    const isMatch = await admin.matchPassword(password);
+    const isMatch = await user.matchPassword(password);
     if (!isMatch) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    const token = jwt.sign(
-      { id: admin._id, role: admin.role },
-      process.env.JWT_SECRET,
-      { expiresIn: "1d" }
-    );
+    const payload = {
+      user: {
+        id: user._id,
+        email: user.email,
+        role: user.role,
+        name: user.name,
+        branchName: user.branchName,
+        yearNumber: user.yearNumber,
+        semesterNumber: user.semesterNumber,
+        rollNumber: user.rollNumber,
+      },
+    };
 
-    res.json({
-      message: "Login successful",
-      token,
-    });
+    jwt.sign(
+      payload,
+      process.env.JWT_SECRET,
+      { expiresIn: "5d" },
+      (err, token) => {
+        if (err) throw err;
+        res.json({ token, user: payload.user });
+      }
+    );
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
 const isAuthenticated = async (req, res) => {
-  const token = req.headers.authorization?.split(" ")[1];
+  let token = req.header("Authorization")?.replace("Bearer ", "");
 
   if (!token) {
     return res.status(401).json({ message: "Not authenticated" });
   }
 
+  token = token.trim(); 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const admin = await Admin.findById(decoded.id).select("-password");
+    const userId = decoded.user.id; 
+    const user = await User.findById(userId).select("-password");
 
-    if (!admin) {
-      return res.status(404).json({ message: "Admin not found" });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
     }
 
     res.status(200).json({
       isAuthenticated: true,
-      admin,
+      user: {
+        id: user._id,
+        email: user.email,
+        role: user.role,
+        name: user.name,
+        branchName: user.branchName,
+        yearNumber: user.yearNumber,
+        semesterNumber: user.semesterNumber,
+        rollNumber: user.rollNumber,
+      },
     });
   } catch (error) {
+    console.error(error); // Log the error for debugging
     res.status(401).json({ message: "Invalid token" });
   }
 };
 
-module.exports = { register, login, isAuthenticated };
+module.exports = { login, isAuthenticated };

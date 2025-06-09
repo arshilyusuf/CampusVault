@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
-import {  Geist_Mono, Host_Grotesk } from "next/font/google";
+import { Geist_Mono, Host_Grotesk } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Beams from "@/Reactbits/Beams/Beams";
 import Footer from "@/components/Footer";
+import { AuthProvider } from "@/context/AuthContext";
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const hostGrotesk = Host_Grotesk({
   variable: "--font-geist-sans",
@@ -31,33 +34,36 @@ export default function RootLayout({
         style={{ position: "relative", minHeight: "100vh" }}
         className={`${hostGrotesk.variable} ${geistMono.variable} antialiased`}
       >
-        <div
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            zIndex: -1,
-            pointerEvents: "none",
-          }}
-        >
-          <Beams
-            beamWidth={5}
-            beamHeight={20}
-            beamNumber={20}
-            lightColor="#c7ff1b"
-            speed={2}
-            noiseIntensity={1}
-            scale={0.2}
-            rotation={45}
-          />
-        </div>
-        <main>
-          <Navbar />
-          {children}
-          <Footer/>
-        </main>
+        <AuthProvider>
+          <div
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: "100%",
+              height: "100%",
+              zIndex: -1,
+              pointerEvents: "none",
+            }}
+          >
+            <Beams
+              beamWidth={5}
+              beamHeight={20}
+              beamNumber={20}
+              lightColor="#c7ff1b"
+              speed={1}
+              noiseIntensity={1}
+              scale={0.2}
+              rotation={45}
+            />
+          </div>
+          <main>
+            <Navbar />
+            {children}
+            <Footer />
+          </main>
+          <ToastContainer />
+        </AuthProvider>
       </body>
     </html>
   );

@@ -177,3 +177,19 @@ main{
     @apply bg-background text-foreground;
   }
 }
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import 'react-toastify/dist/ReactToastify.css';
+
+.Toastify__toast {
+  background: rgba(0, 0, 0, 0.4) !important;
+  backdrop-filter: blur(20px) !important;
+  color:white
+}
+
+.Toastify__toast--success {
+  color: var(--color-3) !important;
+}
