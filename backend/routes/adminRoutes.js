@@ -17,5 +17,6 @@ router.post(
   upload.single("pdf"),
   adminController.uploadPdfToSubject
 );
-
+router.get("/contributions/:branchName/:yearNumber", adminController.getContributionsByBranchAndYear);
+router.get("/approveContribution/:id", adminController.approveContribution);
 module.exports = router;

@@ -4,11 +4,13 @@ import SplitText from "@/Reactbits/SplitText/SplitText";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Button from "@/components/Button";
+import { useRouter } from "next/navigation";
 gsap.registerPlugin(ScrollTrigger);
 
 export default function ContributeSection() {
   const textRef = useRef(null);
   const starRef = useRef(null);
+  const router = useRouter();
 
   useEffect(() => {
     if (textRef.current) {
@@ -67,7 +69,7 @@ export default function ContributeSection() {
       </div>
 
       <div ref={starRef} className="opacity-0">
-        <Button>
+        <Button onClick={() => router.push("/contribute")}> 
             Contribute Now
         </Button>
       </div>

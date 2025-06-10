@@ -35,3 +35,31 @@ exports.createRequest = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+// Get all requests by branch and yearNumber (maps to semesters)
+exports.getRequestsByBranchAndYear = async (req, res) => {
+    try {
+        const { branchName, yearNumber } = req.params;
+        if (!branchName || !yearNumber) {
+            return res.status(400).json({ message: "branchName and yearNumber are required" });
+        }
+
+        // Map yearNumber to semesters
+        const year = parseInt(yearNumber, 10);
+        let semesters = [];
+        if (!isNaN(year) && year > 0) {
+            semesters = [year * 2 - 1, year * 2];
+        } else {
+            return res.status(400).json({ message: "Invalid yearNumber" });
+        }
+
+        const requests = await Request.find({
+            branchName,
+            semesterNumber: { $in: semesters }
+        });
+        res.json(requests);
+    } catch (error) {
+        console.error("Error in getRequestsByBranchAndYear:", error.message);
+        res.status(500).json({ message: error.message });
+    }
+};

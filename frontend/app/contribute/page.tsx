@@ -7,6 +7,7 @@ import "react-toastify/dist/ReactToastify.css";
 import Button from "@/components/Button";
 
 const branches = [
+  "Select Branch",
   "Computer Science and Engineering",
   "Electronics",
   "Mechanical",
@@ -16,7 +17,7 @@ const branches = [
   "Other",
 ];
 
-const semesters = ["1", "2", "3", "4", "5", "6", "7", "8"];
+const semesters = ["Select Semester","1", "2", "3", "4", "5", "6", "7", "8"];
 
 const uploadTypes = ["endsem", "midsem", "lectures", "notes", "other"];
 
@@ -47,18 +48,14 @@ export default function ContributePage() {
         );
         if (response.ok) {
           const data = await response.json();
-          console.log(data);
           setSubjects(
             data.subjects.map((subject: { name: string }) => subject.name)
           );
         } else {
-          console.error("Failed to fetch subjects");
-          toast.error("Failed to fetch subjects");
+          
           setSubjects([]);
         }
       } catch (error) {
-        console.error("Error fetching subjects:", error);
-        toast.error("Error fetching subjects");
         setSubjects([]);
       } finally {
         setIsLoadingSubjects(false);
@@ -70,7 +67,7 @@ export default function ContributePage() {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      setPdfFiles(Array.from(e.target.files));
+      setPdfFiles((prev) => [...prev, ...Array.from(e.target.files)]);
     }
   };
 
@@ -89,7 +86,11 @@ export default function ContributePage() {
       pdfFiles.forEach((file) => {
         formData.append("pdfFiles", file);
       });
-     
+
+      // Add this before your fetch call
+      for (const pair of formData.entries()) {
+        console.log(pair[0] + ":", pair[1]);
+      }
 
       const response = await fetch(
         "http://localhost:8000/api/users/contribute",
@@ -101,7 +102,7 @@ export default function ContributePage() {
           body: formData,
         }
       );
-
+      console.log("Contribution response:", response);
       if (response.ok) {
         toast.success(
           "Your contribution has been sent to the admins and will be reviewed"
@@ -111,6 +112,7 @@ export default function ContributePage() {
         setSubjectName("");
         setUploadType(uploadTypes[0]);
         setPdfFiles([]);
+        router.push("/");
       } else {
         const errorData = await response.json();
         toast.error(
@@ -127,13 +129,16 @@ export default function ContributePage() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[80vh] py-12 gap-8">
-      <h1 className="text-4xl font-bold text-center text-[var(--color-3)]">
-        Contribute Material
-      </h1>
+    <div
+      className="flex items-left justify-between  min-h-[80vh] rounded-4xl gap-8 backdrop-blur-3xl"
+      style={{
+        background:
+          "linear-gradient(135deg,#c7ff1bbd 20%, transparent 120%),  #000000ba ",
+      }}
+    >
       <form
         onSubmit={handleSubmit}
-        className="flex flex-col gap-6 p-8 bg-black/20 rounded-2xl backdrop-blur-2xl"
+        className="flex flex-col w-[60%] overflow-hidden overflow-y-auto gap-6 p-8 pt-15 bg-black rounded-4xl rounded-tr-[5rem] rounded-br-[5rem]"
       >
         <label className="block text-5 font-bold  text-white">
           Branch:
@@ -223,14 +228,17 @@ export default function ContributePage() {
             </ul>
           </div>
         )}
-        <Button
-          type="submit"
-          buttonClassName="w-fit"
-          disabled={isSubmitting}
-        >
+        <Button type="submit" buttonClassName="w-full" disabled={isSubmitting}>
           {isSubmitting ? "Submitting..." : "Submit Contribution"}
         </Button>
       </form>
+      <h1 className="text-4xl flex flex-col font-black text-right mt-7 tracking-tight mr-10 text-[var(--black]">
+        Contribute Material
+        <span className="text-lg font-thin text-white mt-3">
+          Select your branch, semester, and subject to send a contribution
+          request. Your request will be reviewed by the admins.
+        </span>
+      </h1>
     </div>
   );
 }

@@ -74,8 +74,8 @@ const uploadPdfToCloudinary = async (file, folderPath) => {
       folder: folderPath,
     });
 
-    const pdfUrl = result.secure_url + "?inline=true";
-    return pdfUrl;
+    // Return the url without '?inline=true'
+    return result.secure_url;
   } catch (error) {
     console.error("Error uploading PDF to Cloudinary:", error);
     throw error;
@@ -84,25 +84,45 @@ const uploadPdfToCloudinary = async (file, folderPath) => {
 
 const createContribution = async (req, res) => {
   try {
+    if (!req.body) {
+      return res.status(400).json({ message: "Request body is required" });
+    }
     console.log("req.body:", req.body);
 
-    const { branchName, semesterNumber, subjectName, uploadType, user, pdfFiles } = req.body;
-    const userId = user.id; 
+    const { branchName, semesterNumber, subjectName, uploadType, user } =
+      req.body;
+
+    // Always parse user if it's a string
+    let userObj = user;
+    if (typeof user === "string") {
+      try {
+        userObj = JSON.parse(user);
+      } catch (e) {
+        return res.status(400).json({ message: "Invalid user data" });
+      }
+    }
+
+    const userId = userObj.id;
+
+    if(!userId) {
+      return res.status(400).json({ message: "Authentication Failed" });
+    }
 
     if (!branchName || !semesterNumber || !subjectName || !uploadType) {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
-    if (!pdfFiles || Object.keys(pdfFiles).length === 0) {
+    if (!req.files || req.files.length === 0) {
       return res.status(400).json({ message: "No PDF files provided" });
     }
 
     const pdfUrls = [];
-    for (const file of pdfFiles) {
+    for (const file of req.files) {
       try {
-        const folderPath = `${user.rollNumber}`;
+        const folderPath = `contributions/${userObj.rollNumber}`;
         const pdfUrl = await uploadPdfToCloudinary(file, folderPath);
-        pdfUrls.push(pdfUrl);
+        // Remove '?inline=true' if present
+        pdfUrls.push(pdfUrl.replace(/\?inline=true$/, ""));
       } catch (uploadError) {
         console.error("Error uploading file:", uploadError);
         return res.status(500).json({ message: "Failed to upload one or more files" });
@@ -115,7 +135,7 @@ const createContribution = async (req, res) => {
       subjectName,
       uploadType,
       userId,
-      pdfUrls: pdfUrls, // Store the array of PDF URLs
+      pdfUrls
     });
 
     await newContribution.save();
@@ -127,7 +147,25 @@ const createContribution = async (req, res) => {
   }
 };
 
+const getUserById = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    if (!userId) {
+      return res.status(400).json({ message: "User ID is required" });
+    }
+    const user = await User.findById(userId).select("-password");
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.json(user);
+  } catch (error) {
+    console.error("Error in getUserById:", error.message);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 module.exports = {
   registerUser,
   createContribution,
+  getUserById,
 };
