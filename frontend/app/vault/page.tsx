@@ -88,7 +88,7 @@ export default function VaultPage() {
             </div>
           </div>
           <div className="mt-4 md:mt-7">
-            <Button type="submit"><SearchIcon/></Button>
+            <Button type="submit" disabled={isLoading} ><SearchIcon/></Button>
           </div>
         </form>
       </div>

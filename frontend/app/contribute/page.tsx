@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation"; // <-- import useSearchParams
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Button from "@/components/Button";
@@ -24,10 +24,19 @@ export const uploadTypes = ["endsem", "midsem", "lectures", "notes", "other"];
 export default function ContributePage() {
   const { user } = useAuth();
   const router = useRouter();
-  const [branchName, setBranchName] = useState(branches[0]);
-  const [semesterNumber, setSemesterNumber] = useState(semesters[0]);
-  const [subjectName, setSubjectName] = useState("");
-  const [uploadType, setUploadType] = useState(uploadTypes[0]);
+  const searchParams = useSearchParams(); // <-- get search params
+
+  // Read params from URL
+  const initialBranchName = searchParams.get("branchName") || branches[0];
+  const initialSemesterNumber = searchParams.get("semesterNumber") || semesters[0];
+  const initialSubjectName = searchParams.get("subjectName") || "";
+  const initialUploadType = searchParams.get("uploadType") || uploadTypes[0];
+
+  // Use initial values from params if present
+  const [branchName, setBranchName] = useState(initialBranchName);
+  const [semesterNumber, setSemesterNumber] = useState(initialSemesterNumber);
+  const [subjectName, setSubjectName] = useState(initialSubjectName);
+  const [uploadType, setUploadType] = useState(initialUploadType);
   const [pdfFiles, setPdfFiles] = useState<File[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [subjects, setSubjects] = useState<string[]>([]);
@@ -209,7 +218,7 @@ export default function ContributePage() {
       file:text-sm file:font-semibold
       file:bg-green-50 file:text-green-700
       hover:file:bg-green-100"
-            accept=".pdf"
+            accept=".pdf, .ppt, .pptx"
           />
         </label>
         {pdfFiles.length > 0 && (

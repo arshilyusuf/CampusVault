@@ -16,7 +16,7 @@ export default function Home() {
             <SplitText
               text="Your Central Hub for"
               delay={100}
-              duration={1.4}
+              duration={1.8}
               ease="power3.out"
               splitType="words"
               from={{ opacity: 0, y: 40 }}
@@ -29,7 +29,7 @@ export default function Home() {
               <SplitText
                 text="Semester-Wise"
                 delay={100}
-                duration={1.4}
+                duration={1.8}
                 ease="power3.out"
                 splitType="words"
                 from={{ opacity: 0, y: 40 }}
@@ -42,7 +42,7 @@ export default function Home() {
             <SplitText
               text="Study Materials"
               delay={100}
-              duration={1.4}
+              duration={2.2}
               ease="power3.out"
               splitType="words"
               from={{ opacity: 0, y: 40 }}

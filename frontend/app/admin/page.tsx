@@ -7,7 +7,10 @@ import { toast } from "react-toastify";
 import { AnimatePresence, motion } from "framer-motion";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { semesters, uploadTypes } from "../contribute/page";
-
+import { XIcon } from "@/components/ui/x";
+import { CheckIcon } from "@/components/ui/check";
+import { UploadIcon } from "@/components/ui/upload";
+import { PlusIcon } from "@/components/ui/plus";
 export default function AdminPage() {
   const { isAuthenticated, user } = useAuth();
   const router = useRouter();
@@ -284,13 +287,13 @@ export default function AdminPage() {
   };
 
   return (
-    <div className="min-h-[90vh] p-8 backdrop-blur-3xl bg-[var(--black)]/10  rounded-4xl">
+    <div className="min-h-[90vh] p-8 backdrop-blur-3xl bg-[var(--color-3)]/10  rounded-4xl">
       <h1 className="text-4xl font-bold mb-8 text-center text-[var(--white)]">
         Admin Dashboard
       </h1>
       <div
         className="grid w-full grid-cols-4 grid-rows-4 gap-8"
-        style={{ minHeight: "60vh", maxHeight: "150vh" }}
+        style={{ minHeight: "60vh", maxHeight: "170vh" }}
       >
         {/* Contribution Requests: spans 2 columns in row 1 */}
         <div className="bg-black rounded-2xl p-6 shadow-lg backdrop-blur-md flex flex-col col-span-4 row-span-2 col-start-1 row-start-1">
@@ -445,7 +448,7 @@ export default function AdminPage() {
                             >
                               {approvingContributionId === req._id
                                 ? "Approving..."
-                                : "Approve"}
+                                : `Approve ${(<CheckIcon size={20} />)}`}
                             </Button>
                             <Button
                               onClick={() => rejectContribution(req._id)}
@@ -455,7 +458,7 @@ export default function AdminPage() {
                                 approvingContributionId === req._id
                               }
                             >
-                              Reject
+                              Reject {<XIcon size={20} />}
                             </Button>
                           </div>
                         </motion.div>
@@ -467,10 +470,14 @@ export default function AdminPage() {
             </ul>
           )}
         </div>
-        <div className="bg-black/20 rounded-2xl p-6 shadow-lg backdrop-blur-md flex flex-col items-left justify-between col-span-2 row-span-2 col-start- row-start-3 shadow-white/10">
-          <h2 className="text-2xl font-semibold mb-4 text-[var(--white)]">
+        <div className="bg-black/40 rounded-2xl p-6 shadow-lg backdrop-blur-md flex flex-col items-left justify-between col-span-2 row-span-2 col-start- row-start-3 shadow-white/5">
+          <h2 className="text-2xl font-semibold mb-[-2rem] text-[var(--white)]">
             Upload Material
           </h2>
+          <p className="text-sm text-white/30 ">
+            Make sure to upload the material in the correct semester, subject
+            and upload type.
+          </p>
           <label className="block text-sm font-medium text-white">
             Semester:
             <select
@@ -546,17 +553,22 @@ export default function AdminPage() {
             </div>
           )}
           <Button
-            buttonClassName="w-full"
+            buttonClassName="w-full "
             disabled={processingRequest}
             onClick={handleSubmitMaterial}
           >
-            Upload Material
+            <div className="flex justify-center">
+              {<UploadIcon size={25} />}
+            </div>
           </Button>
         </div>
-        <div className="bg-black/20 rounded-2xl p-6 shadow-lg backdrop-blur-md flex flex-col items-left justify-center col-span-2 row-span-1 col-start-3 row-start-3 shadow-white/10">
-          <h2 className="text-2xl font-semibold mb-4 text-[var(--white)]">
+        <div className="bg-black/40 rounded-2xl p-6 shadow-lg backdrop-blur-md flex flex-col items-left justify-center col-span-2 row-span-1 col-start-3 row-start-3 shadow-white/5">
+          <h2 className="text-2xl font-semibold text-[var(--white)]">
             Add New Subject
           </h2>
+          <p className="text-sm text-white/30 mb-4 ">
+            Please enter the subject name in Title Case with appropriate spaces.
+          </p>
           <input
             type="text"
             placeholder="Subject Name"
@@ -575,12 +587,17 @@ export default function AdminPage() {
           />
 
           <Button
-            buttonClassName="w-full"
+            buttonClassName="w-full mt-3"
             disabled={processingRequest}
             onClick={handleAddSubjectSubmit}
           >
-            Add Subject
+            <div className="flex justify-center">{<PlusIcon size={25} />}</div>
           </Button>
+        </div>
+        <div className="bg-black/40 rounded-2xl p-6 shadow-lg backdrop-blur-md flex flex-col items-left justify-center col-span-2 row-span-1 col-start-3 row-start-4 shadow-white/5">
+          <h2 className="text-2xl font-semibold text-[var(--white)]">
+            Delete Material
+          </h2>
         </div>
       </div>
     </div>

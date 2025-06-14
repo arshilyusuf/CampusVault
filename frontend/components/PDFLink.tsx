@@ -31,7 +31,13 @@ export default function PDFLink({ subject, uploadtype }) {
       router.push('/login');
       return;
     }
-    // ...existing code...
+    const params = new URLSearchParams({
+      branchName: subject.branchName,
+      semesterNumber: subject.semesterNumber,
+      subjectName: subject.name,
+      uploadType: uploadtype,
+    });
+    router.push(`/contribute?${params.toString()}`);
   };
 
   const handleRequest = async () => {
@@ -56,9 +62,6 @@ export default function PDFLink({ subject, uploadtype }) {
         requestingUser: user?.id, // Use user ID from AuthContext
       };
 
-      console.log("Request URL:", url);
-      console.log("Request data:", requestData);
-      console.log("Authorization token:", localStorage.getItem('token'));
 
       const response = await fetch(url, {
         method: 'POST',
