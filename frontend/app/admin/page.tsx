@@ -12,9 +12,14 @@ export default function AdminPage() {
   const router = useRouter();
   const [requests, setRequests] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [expandedRequestId, setExpandedRequestId] = useState<string | null>(null);
+  const [expandedRequestId, setExpandedRequestId] = useState<string | null>(
+    null
+  );
   const [userDetails, setUserDetails] = useState<Record<string, any>>({});
-  const [approvingContributionId, setApprovingContributionId] = useState<string | null>(null);
+  const [approvingContributionId, setApprovingContributionId] = useState<
+    string | null
+  >(null);
+  const [processingRequest, setProcessingRequest] = useState(false);
 
   // Only allow admins
   useEffect(() => {
@@ -86,6 +91,7 @@ export default function AdminPage() {
 
   const approveContribution = async (id: string) => {
     setApprovingContributionId(id);
+    setProcessingRequest(true);
     try {
       const res = await fetch(
         `http://localhost:8000/api/admin/approveContribution/${id}`,
@@ -104,7 +110,8 @@ export default function AdminPage() {
       } else {
         const errorData = await res.json();
         toast.error(
-          `Failed to approve contribution: ${errorData.message || "Unknown error"
+          `Failed to approve contribution: ${
+            errorData.message || "Unknown error"
           }`
         );
       }
@@ -112,6 +119,40 @@ export default function AdminPage() {
       toast.error(`Failed to approve contribution: ${err.message}`);
     } finally {
       setApprovingContributionId(null);
+      setProcessingRequest(false);
+    }
+  };
+
+  const rejectContribution = async (id: string) => {
+    setProcessingRequest(true);
+
+    try {
+      const res = await fetch(
+        `http://localhost:8000/api/admin/rejectContribution/${id}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      if (res.ok) {
+        toast.success("Contribution rejected successfully!");
+        // Refresh requests after rejection
+        const updatedRequests = requests.filter((req) => req._id !== id);
+        setRequests(updatedRequests);
+      } else {
+        const errorData = await res.json();
+        toast.error(
+          `Failed to reject contribution: ${
+            errorData.message || "Unknown error"
+          }`
+        );
+      }
+    } catch (err: any) {
+      toast.error(`Failed to reject contribution: ${err.message}`);
+    } finally {
+      setProcessingRequest(false);
     }
   };
 
@@ -133,17 +174,20 @@ export default function AdminPage() {
       </h1>
       <div
         className="grid w-full grid-cols-4 grid-rows-4 gap-8"
-          style={{ minHeight: "60vh" }}
+        style={{ minHeight: "60vh" }}
       >
         {/* Contribution Requests: spans 2 columns in row 1 */}
         <div className="bg-black rounded-2xl p-6 shadow-lg backdrop-blur-md flex flex-col col-span-4 row-span-3 col-start-1 row-start-1">
-          <h2 className="text-3xl w-fit pb-2 font-semibold mb-4 border-b-4 border-b-[var(--color-3)] text-[var(--color-3)]">
+          <h2 className="flex items-center justify-center gap-2 text-3xl w-fit pb-2 font-semibold mb-4 border-b-4 border-b-[var(--color-3)] text-[var(--color-3)]">
             Contribution Requests
+            <div className="w-5 h-5 flex items-center justify-center rounded-full text-sm font-semibold bg-yellow-400 text-black">{requests.length > 0 && requests.length}</div>
           </h2>
           {loading ? (
             <div>Loading...</div>
           ) : requests.length === 0 ? (
-            <div className="text-white w-full h-full flex items-center justify-center">No requests found for your branch and year.</div>
+            <div className="text-white w-full h-full flex items-center justify-center">
+              No requests found for your branch and year.
+            </div>
           ) : (
             <ul className="space-y-4 max-h-72 overflow-y-auto">
               {requests.map((req) => {
@@ -272,14 +316,26 @@ export default function AdminPage() {
                           </div>
                           <div className="my-4 flex justify-end gap-4">
                             <Button
-                              disabled={!!approvingContributionId}
+                              disabled={
+                                processingRequest ||
+                                approvingContributionId === req._id
+                              }
                               onClick={() => approveContribution(req._id)}
                             >
                               {approvingContributionId === req._id
                                 ? "Approving..."
                                 : "Approve"}
                             </Button>
-                            <Button backgroundColor="red">Reject</Button>
+                            <Button
+                              onClick={() => rejectContribution(req._id)}
+                              backgroundColor="red"
+                              disabled={
+                                processingRequest ||
+                                approvingContributionId === req._id
+                              }
+                            >
+                              Reject
+                            </Button>
                           </div>
                         </motion.div>
                       )}

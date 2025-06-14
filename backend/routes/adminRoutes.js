@@ -19,4 +19,5 @@ router.post(
 );
 router.get("/contributions/:branchName/:yearNumber", adminController.getContributionsByBranchAndYear);
 router.get("/approveContribution/:id", adminController.approveContribution);
+router.get("/rejectContribution/:id", adminController.rejectContribution);
 module.exports = router;

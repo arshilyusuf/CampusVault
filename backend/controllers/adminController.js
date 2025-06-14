@@ -372,6 +372,54 @@ const approveContribution = async (req, res) => {
   }
 };
 
+const rejectContribution = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const contribution = await Contribution.findById(id);
+
+    if (!contribution) {
+      return res.status(404).json({ message: "Contribution not found" });
+    }
+
+    const { pdfUrls } = contribution;
+
+    for (const url of pdfUrls) {
+      const matches = url.match(/\/upload\/v\d+\/([^\s]+)/);
+      if (!matches || !matches[1]) {
+        console.warn(`Could not extract public_id from URL: ${url}`);
+        continue;
+      }
+      let originalPublicId = matches[1].replace(/\.[^/.]+$/, "");
+      console.log("Extracted public ID for deletion:", originalPublicId);
+
+      try {
+        console.log(`Deleting original PDF from Cloudinary: ${url}`);
+        const result = await cloudinary.uploader.destroy(originalPublicId, {
+          resource_type: "raw",
+        });
+        console.log(`Deleted original PDF from Cloudinary: ${url}`, result);
+        if (result.result !== "ok" && result.result !== "not found") {
+          console.error(`Failed to delete ${url}:`, result);
+        }
+      } catch (err) {
+        if (err.http_code === 404) {
+          console.log(`Resource not found, skipping deletion: ${url}`);
+        } else {
+          console.error(`Failed to delete from Cloudinary: ${url}`, err);
+        }
+      }
+    }
+
+    await Contribution.findByIdAndDelete(id);
+    console.log(`Contribution rejected and deleted: ${id}`);
+
+    res.status(200).json({ message: "Contribution rejected and deleted" });
+  } catch (err) {
+    console.error("Error rejecting contribution:", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 module.exports = {
   addBranch,
   getAllBranches,
@@ -381,4 +429,5 @@ module.exports = {
   getSubjectDetails,
   getContributionsByBranchAndYear,
   approveContribution,
+  rejectContribution,
 };
