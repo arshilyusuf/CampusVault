@@ -12,8 +12,8 @@ router.use(protect);
 
 router.post("/branches", adminController.addBranch);
 router.post(
-  "/subjects/uploadPdf",
-  upload.single("pdf"),
+  "/uploadPdf",
+  upload.array("pdfFiles"),
   adminController.uploadPdfToSubject
 );
 router.post("/addSubject", adminController.addSubject);

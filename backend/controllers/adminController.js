@@ -94,72 +94,117 @@ const getAllBranches = async (req, res) => {
   }
 };
 
+const uploadPdfs = upload.array('pdfFiles');
+
+const uploadPdfToCloudinary = async (file, folderPath) => {
+  const dataUri = `data:${file.mimetype};base64,${file.buffer.toString("base64")}`;
+  const result = await cloudinary.uploader.upload(dataUri, {
+    resource_type: "raw",
+    folder: folderPath,
+  });
+  return result.secure_url;
+};
+
 const uploadPdfToSubject = async (req, res) => {
-  try {
-    const { branchName, semesterNumber, subjectName, uploadType } = req.body;
+  
 
-    if (!branchName || !semesterNumber || !subjectName || !uploadType) {
-      return res.status(400).json({
-        message:
-          "Branch name, semester number, subject name, and upload type are required",
+    try {
+      if (!req.body) {
+        return res.status(400).json({ message: "Request body is required" });
+      }
+      
+      const { branchName, semesterNumber, subjectName, uploadType, user } = req.body;      
+      let userObj = user;
+      if (typeof user === "string") {
+        try {
+          userObj = JSON.parse(user);
+        } catch (e) {
+          return res.status(400).json({ message: "Invalid user data" });
+        }
+      }
+
+      const userId = userObj.id;
+      if (!userId) {
+        return res.status(400).json({ message: "Authentication Failed" });
+      }
+
+      if (!branchName || !semesterNumber || !subjectName || !uploadType) {
+        return res.status(400).json({ message: "Missing required fields" });
+      }
+
+      if (!req.files || req.files.length === 0) {
+        return res.status(400).json({ message: "No PDF files provided" });
+      }
+
+      // Step 1: Upload PDFs to contributions/{rollNumber}
+      const pdfUrls = [];
+      for (const file of req.files) {
+        try {
+          const folderPath = `contributions/${userObj.rollNumber}`;
+          const pdfUrl = await uploadPdfToCloudinary(file, folderPath);
+          // Remove '?inline=true' if present
+          pdfUrls.push(pdfUrl.replace(/\?inline=true$/, ""));
+        } catch (uploadError) {
+          console.error("Error uploading file:", uploadError);
+          return res.status(500).json({ message: "Failed to upload one or more files" });
+        }
+      }
+
+      // Step 2: Find branch, semester, subject
+      const branch = await Branch.findOne({ branchName });
+      if (!branch) {
+        return res.status(404).json({ message: `Branch '${branchName}' not found` });
+      }
+      const semester = await Semester.findOne({
+        branchId: branch._id,
+        semesterNumber: Number(semesterNumber),
       });
-    }
+      if (!semester) {
+        return res.status(404).json({
+          message: `Semester ${semesterNumber} not found for branch '${branchName}'`,
+        });
+      }
+      let subject = await Subject.findOne({ name: subjectName });
+      if (!subject) {
+        return res.status(404).json({ message: `Subject '${subjectName}' not found` });
+      }
 
-    const branch = await Branch.findOne({ branchName });
-    if (!branch) {
-      return res
-        .status(404)
-        .json({ message: `Branch '${branchName}' not found` });
-    }
+      // Step 3: Move PDFs to subject folder and update subject
+      const targetFolder = `${branchName}/${semesterNumber}/${subjectName}/${uploadType}`;
+      for (const url of pdfUrls) {
+        const matches = url.match(/\/upload\/v\d+\/([^\s]+)/);
+        if (!matches || !matches[1]) {
+          console.warn(`Could not extract public_id from URL: ${url}`);
+          continue;
+        }
+        let originalPublicId = matches[1].replace(/\.[^/.]+$/, "");
+        const fileBuffer = await fetch(url).then((res) => res.arrayBuffer());
+        const fileName = originalPublicId.split("/").pop();
+        const dataUri = `data:application/pdf;base64,${Buffer.from(fileBuffer).toString("base64")}`;
+        const uploadResult = await cloudinary.uploader.upload(dataUri, {
+          resource_type: "raw",
+          folder: targetFolder,
+          public_id: fileName,
+        });
+        const newPdfUrl = uploadResult.secure_url;
 
-    const semester = await Semester.findOne({
-      branchId: branch._id,
-      semesterNumber: Number(semesterNumber),
-    });
-    if (!semester) {
-      return res.status(404).json({
-        message: `Semester ${semesterNumber} not found for branch '${branchName}'`,
+        if (Array.isArray(subject[uploadType])) {
+          subject[uploadType].push(newPdfUrl);
+        } else {
+          subject[uploadType] = [newPdfUrl];
+        }
+      }
+
+      await subject.save();
+      res.status(200).json({
+        message: "Contribution approved and material uploaded",
+        subject,
       });
+    } catch (err) {
+      console.error("Error uploading PDF to subject:", err);
+      res.status(500).json({ message: "Internal server error" });
     }
-
-    let subject = await Subject.findOne({ name: subjectName });
-    if (!subject) {
-      return res
-        .status(404)
-        .json({ message: `Subject '${subjectName}' not found` });
-    }
-
-    if (!req.file) {
-      return res.status(400).json({ message: "No file uploaded" });
-    }
-
-    const folderPath = `${branchName}/${semesterNumber}/${subjectName}/${uploadType}`;
-
-    const dataUri = `data:${
-      req.file.mimetype
-    };base64,${req.file.buffer.toString("base64")}`;
-
-    const result = await cloudinary.uploader.upload(dataUri, {
-      resource_type: "auto",
-      folder: folderPath,
-    });
-
-    const pdfUrl = result.secure_url;
-
-    if (Array.isArray(subject[uploadType])) {
-      subject[uploadType].push(pdfUrl);
-    } else {
-      subject[uploadType] = [pdfUrl];
-    }
-
-    console.log(`Uploaded ${uploadType} PDF to Cloudinary:`, pdfUrl);
-    await subject.save();
-
-    res.status(200).json({ message: "PDF uploaded successfully", subject });
-  } catch (err) {
-    console.error("Error uploading PDF to Cloudinary:", err);
-    res.status(500).json({ message: "Internal server error" });
-  }
+  
 };
 
 const getSubjectDetails = async (req, res) => {
@@ -445,6 +490,7 @@ const addSubject = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
 
 module.exports = {
   addBranch,

@@ -6,6 +6,7 @@ import Button from "@/components/Button";
 import { toast } from "react-toastify";
 import { AnimatePresence, motion } from "framer-motion";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
+import { semesters, uploadTypes } from "../contribute/page";
 
 export default function AdminPage() {
   const { isAuthenticated, user } = useAuth();
@@ -22,6 +23,12 @@ export default function AdminPage() {
   const [processingRequest, setProcessingRequest] = useState(false);
   const [newSubjectName, setNewSubjectName] = useState("");
   const [newSubjectSemester, setNewSubjectSemester] = useState("");
+  const [semesterNumber, setSemesterNumber] = useState(semesters[0]);
+  const [subjectName, setSubjectName] = useState("");
+  const [uploadType, setUploadType] = useState(uploadTypes[0]);
+  const [pdfFiles, setPdfFiles] = useState<File[]>([]);
+  const [subjects, setSubjects] = useState<string[]>([]);
+  const [isLoadingSubjects, setIsLoadingSubjects] = useState(false);
 
   // Only allow admins
   useEffect(() => {
@@ -65,6 +72,35 @@ export default function AdminPage() {
     };
     if (user?.branchName && user?.yearNumber) fetchRequests();
   }, [user]);
+
+  // Fetch subjects for the selected semester
+  useEffect(() => {
+    const fetchSubjects = async () => {
+      setIsLoadingSubjects(true);
+      try {
+        const response = await fetch(
+          `http://localhost:8000/api/public/subjects/${encodeURIComponent(
+            user?.branchName || ""
+          )}/${semesterNumber}`
+        );
+        if (response.ok) {
+          const data = await response.json();
+          setSubjects(
+            data.subjects.map((subject: { name: string }) => subject.name)
+          );
+        } else {
+          
+          setSubjects([]);
+        }
+      } catch (error) {
+        setSubjects([]);
+      } finally {
+        setIsLoadingSubjects(false);
+      }
+    };
+
+    fetchSubjects();
+  }, [user?.branchName, semesterNumber]);
 
   const handleExpand = async (req: any) => {
     if (expandedRequestId === req._id) {
@@ -158,13 +194,56 @@ export default function AdminPage() {
     }
   };
 
-  // Placeholder handlers for upload and add subject
-  const handleUploadMaterial = () => {
-    toast.info("Upload Material clicked");
-    // Implement upload logic or modal here
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setPdfFiles((prevFiles) => [...prevFiles, ...Array.from(e.target.files)]);
+    }
   };
 
+  const handleSubmitMaterial = async () => {
+    if (!semesterNumber || !subjectName || !uploadType || pdfFiles.length === 0) {
+      toast.error("All fields are required");
+      return;
+    }
 
+    const formData = new FormData();
+    pdfFiles.forEach((file) => {
+      formData.append("pdfFiles", file);
+    });
+    formData.append("semesterNumber", semesterNumber);
+    formData.append("branchName", user?.branchName || "");
+    formData.append("subjectName", subjectName);
+    formData.append("uploadType", uploadType);
+    formData.append("user", JSON.stringify(user));
+    for (const pair of formData.entries()) {
+      console.log(pair[0] + ":", pair[1]);
+    }
+
+    try {
+      setProcessingRequest(true);
+      const res = await fetch("http://localhost:8000/api/admin/uploadPdf", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: formData,
+      });
+
+      if (res.ok) {
+        toast.success("Material uploaded successfully!");
+        setPdfFiles([]);
+      } else {
+        const errorData = await res.json();
+        toast.error(
+          `Failed to upload material: ${errorData.message || "Unknown error"}`
+        );
+      }
+    } catch (err: any) {
+      toast.error(`Failed to upload material: ${err.message}`);
+    }finally {
+      setProcessingRequest(false);
+    }
+  };
 
   const handleAddSubjectSubmit = async () => {
     if (!newSubjectName || !newSubjectSemester) {
@@ -173,6 +252,7 @@ export default function AdminPage() {
     }
 
     try {
+      setProcessingRequest(true);
       const res = await fetch("http://localhost:8000/api/admin/addSubject", {
         method: "POST",
         headers: {
@@ -198,6 +278,8 @@ export default function AdminPage() {
       }
     } catch (err: any) {
       toast.error(`Failed to add subject: ${err.message}`);
+    }finally{
+      setProcessingRequest(false);
     }
   };
 
@@ -220,6 +302,7 @@ export default function AdminPage() {
               </div>
             )}
           </h2>
+
           {loading ? (
             <div>Loading...</div>
           ) : requests.length === 0 ? (
@@ -384,15 +467,93 @@ export default function AdminPage() {
             </ul>
           )}
         </div>
-        <div className="bg-white/80 rounded-2xl p-6 shadow-lg backdrop-blur-md flex flex-col items-center justify-center col-span-2 row-span-1 col-start- row-start-3">
-          <h2 className="text-2xl font-semibold mb-4 text-[var(--black)]">
+        <div className="bg-black/20 rounded-2xl p-6 shadow-lg backdrop-blur-md flex flex-col items-left justify-between col-span-2 row-span-2 col-start- row-start-3 shadow-white/10">
+          <h2 className="text-2xl font-semibold mb-4 text-[var(--white)]">
             Upload Material
           </h2>
-          <Button buttonClassName="w-full" onClick={handleUploadMaterial}>
-            Upload
+          <label className="block text-sm font-medium text-white">
+            Semester:
+            <select
+              value={semesterNumber}
+              onChange={(e) => setSemesterNumber(e.target.value)}
+              className="mt-1 block w-full rounded-md border-gray-300 font-semibold shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white/20 p-3"
+            >
+              {semesters.map((semester) => (
+                <option key={semester} value={semester}>
+                  {semester}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="block text-sm font-medium text-white">
+            Subject Name:
+            {isLoadingSubjects ? (
+              <div>Loading subjects...</div>
+            ) : subjects.length === 0 ? (
+              <div>No subjects available</div>
+            ) : (
+              <select
+                value={subjectName}
+                onChange={(e) => setSubjectName(e.target.value)}
+                className="mt-1 block w-full rounded-md border-gray-300 font-semibold shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white/20 p-3"
+              >
+                {subjects.map((subject) => (
+                  <option key={subject} value={subject}>
+                    {subject}
+                  </option>
+                ))}
+              </select>
+            )}
+          </label>
+          <label className="block text-sm font-medium text-white">
+            Upload Type:
+            <select
+              value={uploadType}
+              onChange={(e) => setUploadType(e.target.value)}
+              className="mt-1 block w-full rounded-md border-gray-300 font-semibold shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white/20 p-3"
+            >
+              {uploadTypes.map((type) => (
+                <option key={type} value={type}>
+                  {type}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="block text-sm font-medium text-white">
+            PDF Files:
+            <input
+              type="file"
+              multiple
+              onChange={handleFileChange}
+              className="mt-1 block w-full text-white file:mr-4 file:py-2 file:px-4
+      file:rounded-full file:border-0
+      file:text-sm file:font-semibold
+      file:bg-green-50 file:text-green-700
+      hover:file:bg-green-100"
+              accept=".pdf"
+            />
+          </label>
+          {pdfFiles.length > 0 && (
+            <div>
+              <p className="text-sm font-medium text-white">Selected Files:</p>
+              <ul>
+                {pdfFiles.map((file, index) => (
+                  <li key={index} className="text-white">
+                    {file.name}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          <Button
+            buttonClassName="w-full"
+            disabled={processingRequest}
+            onClick={handleSubmitMaterial}
+          >
+            Upload Material
           </Button>
         </div>
-        <div className="bg-black/20 rounded-2xl p-6 shadow-lg backdrop-blur-md flex flex-col items-left justify-center col-span-2 row-span-1 col-start-3 row-start-3">
+        <div className="bg-black/20 rounded-2xl p-6 shadow-lg backdrop-blur-md flex flex-col items-left justify-center col-span-2 row-span-1 col-start-3 row-start-3 shadow-white/10">
           <h2 className="text-2xl font-semibold mb-4 text-[var(--white)]">
             Add New Subject
           </h2>
@@ -413,7 +574,11 @@ export default function AdminPage() {
             onChange={(e) => setNewSubjectSemester(e.target.value)}
           />
 
-          <Button buttonClassName="w-full" onClick={handleAddSubjectSubmit}>
+          <Button
+            buttonClassName="w-full"
+            disabled={processingRequest}
+            onClick={handleAddSubjectSubmit}
+          >
             Add Subject
           </Button>
         </div>
