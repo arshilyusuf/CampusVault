@@ -85,48 +85,6 @@ const getSubjectsBySemester = async (req, res) => {
   }
 };
 
-const addSubjectToSemester = async (req, res) => {
-  try {
-    const { branchName, semesterNumber, subjectName } = req.body;
-    if (!branchName || !semesterNumber || !subjectName) {
-      return res.status(400).json({
-        message: "Branch name, semester number, and subject name are required",
-      });
-    }
-    const branch = await Branch.findOne({ branchName });
-    if (!branch) {
-      return res
-        .status(404)
-        .json({ message: `Branch '${branchName}' not found` });
-    }
-    const semester = await Semester.findOne({
-      branchId: branch._id,
-      semesterNumber: Number(semesterNumber),
-    });
-    if (!semester) {
-      return res
-        .status(404)
-        .json({
-          message: `Semester ${semesterNumber} not found for branch '${branchName}'`,
-        });
-    }
-    let subject = await Subject.findOne({ name: subjectName });
-    if (!subject) {
-      subject = new Subject({ name: subjectName });
-      await subject.save();
-    }
-    semester.subjects.push({
-      subjectId: subject._id,
-      subjectName: subject.name,
-    });
-    await semester.save();
-    res.status(200).json({ message: 'Subject added to semester successfully', semester });
-  } catch (err) {
-    console.error("Error adding subject to semester:", err);
-    res.status(500).json({ message: "Internal server error" });
-  }
-};
-
 const getAllBranches = async (req, res) => {
   try {
     const branches = await Branch.find();
@@ -420,14 +378,82 @@ const rejectContribution = async (req, res) => {
   }
 };
 
+const addSubject = async (req, res) => {
+  try {
+    const { branchName, semesterNumber, subjectName } = req.body;
+    const user = req.user;
+
+    if (!user || user.role !== 'admin') {
+      return res.status(403).json({ message: "Unauthorized: Admin access required" });
+    }
+
+    if (!branchName || !semesterNumber || !subjectName) {
+      return res.status(400).json({ message: "Branch name, semester number, and subject name are required" });
+    }
+
+    if (user.branchName !== branchName) {
+      return res.status(403).json({ message: "Unauthorized: Admin can only add subjects to their own branch" });
+    }
+
+    const yearNumber = user.yearNumber;
+    const semester = Number(semesterNumber);
+
+    if (isNaN(semester) || semester < 1 || semester > 8) {
+      return res.status(400).json({ message: "Invalid semester number" });
+    }
+
+    const allowedSemesters = [];
+    for (let i = 1; i <= yearNumber * 2; i++) {
+      allowedSemesters.push(i);
+    }
+
+    if (!allowedSemesters.includes(semester)) {
+      return res.status(403).json({ message: "Unauthorized: Admin cannot add subjects to this semester based on their year" });
+    }
+
+    const branch = await Branch.findOne({ branchName });
+    if (!branch) {
+      return res.status(404).json({ message: `Branch '${branchName}' not found` });
+    }
+
+    let semesterDoc = await Semester.findOne({
+      branchId: branch._id,
+      semesterNumber: semester,
+    });
+
+    if (!semesterDoc) {
+      return res.status(404).json({
+        message: `Semester ${semesterNumber} not found for branch '${branchName}'`,
+      });
+    }
+
+    let subject = await Subject.findOne({ name: subjectName, branchName: branchName });
+    if (subject) {
+      return res.status(400).json({ message: 'Subject already exists in this branch' });
+    }
+
+    subject = new Subject({ name: subjectName, branchName: branchName, semesterNumber:user.semesterNumber });
+    const savedSubject = await subject.save();
+
+    semesterDoc.subjects.push({ subjectId: savedSubject._id, subjectName: savedSubject.name });
+    await semesterDoc.save();
+
+    res.status(201).json({ message: "Subject added successfully", subject: savedSubject });
+
+  } catch (err) {
+    console.error("Error adding subject:", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 module.exports = {
   addBranch,
   getAllBranches,
   getSubjectsBySemester,
-  addSubjectToSemester,
   uploadPdfToSubject,
   getSubjectDetails,
   getContributionsByBranchAndYear,
   approveContribution,
   rejectContribution,
+  addSubject,
 };

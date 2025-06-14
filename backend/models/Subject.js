@@ -9,7 +9,7 @@ const subjectSchema = new mongoose.Schema({
   semesterId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Semester",
-    required: true,
+    
   },
   semesterNumber: {
     type: Number,
@@ -18,7 +18,7 @@ const subjectSchema = new mongoose.Schema({
   branchId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Branch",
-    required: true,
+   
   },
   branchName: {
     type: String,

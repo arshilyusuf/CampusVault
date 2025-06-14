@@ -20,6 +20,8 @@ export default function AdminPage() {
     string | null
   >(null);
   const [processingRequest, setProcessingRequest] = useState(false);
+  const [newSubjectName, setNewSubjectName] = useState("");
+  const [newSubjectSemester, setNewSubjectSemester] = useState("");
 
   // Only allow admins
   useEffect(() => {
@@ -162,9 +164,41 @@ export default function AdminPage() {
     // Implement upload logic or modal here
   };
 
-  const handleAddSubject = () => {
-    toast.info("Add Subject clicked");
-    // Implement add subject logic or modal here
+
+
+  const handleAddSubjectSubmit = async () => {
+    if (!newSubjectName || !newSubjectSemester) {
+      toast.error("Subject name and semester are required");
+      return;
+    }
+
+    try {
+      const res = await fetch("http://localhost:8000/api/admin/addSubject", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify({
+          branchName: user?.branchName,
+          semesterNumber: newSubjectSemester,
+          subjectName: newSubjectName,
+        }),
+      });
+
+      if (res.ok) {
+        toast.success("Subject added successfully!");
+        setNewSubjectName("");
+        setNewSubjectSemester("");
+      } else {
+        const errorData = await res.json();
+        toast.error(
+          `Failed to add subject: ${errorData.message || "Unknown error"}`
+        );
+      }
+    } catch (err: any) {
+      toast.error(`Failed to add subject: ${err.message}`);
+    }
   };
 
   return (
@@ -174,18 +208,22 @@ export default function AdminPage() {
       </h1>
       <div
         className="grid w-full grid-cols-4 grid-rows-4 gap-8"
-        style={{ minHeight: "60vh" }}
+        style={{ minHeight: "60vh", maxHeight: "150vh" }}
       >
         {/* Contribution Requests: spans 2 columns in row 1 */}
-        <div className="bg-black rounded-2xl p-6 shadow-lg backdrop-blur-md flex flex-col col-span-4 row-span-3 col-start-1 row-start-1">
+        <div className="bg-black rounded-2xl p-6 shadow-lg backdrop-blur-md flex flex-col col-span-4 row-span-2 col-start-1 row-start-1">
           <h2 className="flex items-center justify-center gap-2 text-3xl w-fit pb-2 font-semibold mb-4 border-b-4 border-b-[var(--color-3)] text-[var(--color-3)]">
             Contribution Requests
-            <div className="w-5 h-5 flex items-center justify-center rounded-full text-sm font-semibold bg-yellow-400 text-black">{requests.length > 0 && requests.length}</div>
+            {requests?.length > 0 && (
+              <div className="w-5 h-5 flex items-center justify-center rounded-full text-sm font-semibold bg-yellow-400 text-black">
+                {requests.length > 0 && requests.length}
+              </div>
+            )}
           </h2>
           {loading ? (
             <div>Loading...</div>
           ) : requests.length === 0 ? (
-            <div className="text-white w-full h-full flex items-center justify-center">
+            <div className="text-white w-full h-[100px] flex items-center justify-center">
               No requests found for your branch and year.
             </div>
           ) : (
@@ -346,7 +384,7 @@ export default function AdminPage() {
             </ul>
           )}
         </div>
-        <div className="bg-white/80 rounded-2xl p-6 shadow-lg backdrop-blur-md flex flex-col items-center justify-center col-span-2 row-span-1 col-start- row-start-4">
+        <div className="bg-white/80 rounded-2xl p-6 shadow-lg backdrop-blur-md flex flex-col items-center justify-center col-span-2 row-span-1 col-start- row-start-3">
           <h2 className="text-2xl font-semibold mb-4 text-[var(--black)]">
             Upload Material
           </h2>
@@ -354,11 +392,28 @@ export default function AdminPage() {
             Upload
           </Button>
         </div>
-        <div className="bg-white/80 rounded-2xl p-6 shadow-lg backdrop-blur-md flex flex-col items-center justify-center col-span-2 row-span-1 col-start-3 row-start-4">
-          <h2 className="text-2xl font-semibold mb-4 text-[var(--black)]">
-            Add Subject
+        <div className="bg-black/20 rounded-2xl p-6 shadow-lg backdrop-blur-md flex flex-col items-left justify-center col-span-2 row-span-1 col-start-3 row-start-3">
+          <h2 className="text-2xl font-semibold mb-4 text-[var(--white)]">
+            Add New Subject
           </h2>
-          <Button buttonClassName="w-full" onClick={handleAddSubject}>
+          <input
+            type="text"
+            placeholder="Subject Name"
+            className="border bg-[var(--white)] p-2 rounded mb-2 text-[var(--black)]"
+            value={newSubjectName}
+            onChange={(e) => setNewSubjectName(e.target.value)}
+          />
+          <input
+            type="number"
+            min="1"
+            max="8"
+            placeholder="Semester"
+            className="border bg-[var(--white)] p-2 rounded mb-2 text-[var(--black)]"
+            value={newSubjectSemester}
+            onChange={(e) => setNewSubjectSemester(e.target.value)}
+          />
+
+          <Button buttonClassName="w-full" onClick={handleAddSubjectSubmit}>
             Add Subject
           </Button>
         </div>
