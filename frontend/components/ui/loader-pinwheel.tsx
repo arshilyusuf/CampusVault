@@ -3,7 +3,7 @@
 import type { Variants, Transition } from 'motion/react';
 import { motion, useAnimation } from 'motion/react';
 import type { HTMLAttributes } from 'react';
-import { forwardRef, useCallback, useImperativeHandle, useRef } from 'react';
+import { forwardRef, useCallback, useImperativeHandle, useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 
 export interface LoaderPinwheelIconHandle {
@@ -13,10 +13,11 @@ export interface LoaderPinwheelIconHandle {
 
 interface LoaderPinwheelIconProps extends HTMLAttributes<HTMLDivElement> {
   size?: number;
+  color?: string;
 }
 
 const gVariants: Variants = {
-  normal: { rotate: 0 }, // if you want to start from a different angle, change this value or remove it entirely
+  normal: { rotate: 0 },
   animate: {
     rotate: 360,
     transition: {
@@ -36,7 +37,7 @@ const defaultTransition: Transition = {
 const LoaderPinwheelIcon = forwardRef<
   LoaderPinwheelIconHandle,
   LoaderPinwheelIconProps
->(({ onMouseEnter, onMouseLeave, className, size = 28, ...props }, ref) => {
+>(({ onMouseEnter, onMouseLeave, className, size = 28, color = 'white', ...props }, ref) => {
   const controls = useAnimation();
   const isControlledRef = useRef(false);
 
@@ -49,26 +50,28 @@ const LoaderPinwheelIcon = forwardRef<
     };
   });
 
+  useEffect(() => {
+    controls.start('animate');
+  }, [controls]);
+
   const handleMouseEnter = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
       if (!isControlledRef.current) {
-        controls.start('animate');
-      } else {
+        // controls.start('animate'); // No longer needed
         onMouseEnter?.(e);
       }
     },
-    [controls, onMouseEnter]
+    [onMouseEnter]
   );
 
   const handleMouseLeave = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
       if (!isControlledRef.current) {
-        controls.start('normal');
-      } else {
+        // controls.start('normal'); // No longer needed
         onMouseLeave?.(e);
       }
     },
-    [controls, onMouseLeave]
+    [onMouseLeave]
   );
 
   return (
@@ -84,7 +87,7 @@ const LoaderPinwheelIcon = forwardRef<
         height={size}
         viewBox="0 0 24 24"
         fill="none"
-        stroke="currentColor"
+        stroke={color}
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"

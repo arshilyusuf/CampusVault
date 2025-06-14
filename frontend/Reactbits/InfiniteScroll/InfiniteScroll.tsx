@@ -164,6 +164,7 @@ const InfiniteScroll: React.FC<InfiniteScrollProps> = ({
         {`
           .infinite-scroll-wrapper {
             max-height: ${maxHeight};
+            
             border-radius: 2.2rem;
           }
 

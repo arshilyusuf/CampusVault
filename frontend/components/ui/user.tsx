@@ -3,7 +3,7 @@
 import type { Variants } from 'motion/react';
 import { motion, useAnimation } from 'motion/react';
 import type { HTMLAttributes } from 'react';
-import { forwardRef, useCallback, useImperativeHandle, useRef } from 'react';
+import { forwardRef, useImperativeHandle, useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 
 export interface UserIconHandle {
@@ -38,7 +38,7 @@ const circleVariant: Variants = {
 };
 
 const UserIcon = forwardRef<UserIconHandle, UserIconProps>(
-  ({ onMouseEnter, onMouseLeave, className, size = 28, ...props }, ref) => {
+  ({ className, size = 28, ...props }, ref) => {
     const controls = useAnimation();
     const isControlledRef = useRef(false);
 
@@ -51,32 +51,20 @@ const UserIcon = forwardRef<UserIconHandle, UserIconProps>(
       };
     });
 
-    const handleMouseEnter = useCallback(
-      (e: React.MouseEvent<HTMLDivElement>) => {
-        if (!isControlledRef.current) {
-          controls.start('animate');
-        } else {
-          onMouseEnter?.(e);
-        }
-      },
-      [controls, onMouseEnter]
-    );
+    useEffect(() => {
+      const animate = async () => {
+        await controls.start('animate');
+        await controls.start('normal');
+      };
 
-    const handleMouseLeave = useCallback(
-      (e: React.MouseEvent<HTMLDivElement>) => {
-        if (!isControlledRef.current) {
-          controls.start('normal');
-        } else {
-          onMouseLeave?.(e);
-        }
-      },
-      [controls, onMouseLeave]
-    );
+      const intervalId = setInterval(animate, 4000);
+
+      return () => clearInterval(intervalId);
+    }, [controls]);
+
     return (
       <div
         className={cn(className)}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
         {...props}
       >
         <svg

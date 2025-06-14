@@ -96,7 +96,7 @@ export default function Home() {
           </Magnet>
         </AnimatedContent>
       </div>
-      <div className="flex items-center justify-center w-[100%] mt-[6rem] rounded-5xl">
+      <div className="flex items-center justify-center w-[100%] mt-[7rem] rounded-5xl">
         <Features />
       </div>
       <ContributeSection />

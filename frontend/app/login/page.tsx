@@ -13,13 +13,8 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const [isFormFilled, setIsFormFilled] = useState(false);
-  const { isAuthenticated, login } = useAuth();
+  const { login } = useAuth();
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      router.push('/vault');
-    }
-  }, [isAuthenticated, router]);
 
   useEffect(() => {
     setIsFormFilled(email !== "" && password !== "");
@@ -29,9 +24,14 @@ export default function LoginPage() {
     e.preventDefault();
     setIsLoading(true);
     try {
-      await login(email, password);
-      toast.success('Login successful!');
-      router.push('/vault');
+      const success = await login(email, password); // Await the login function and store the result
+
+      if (success) {
+        toast.success('Login successful!');
+        router.push('/vault'); // Redirect on success
+      } else {
+        toast.error('Login failed. Please check your credentials.');
+      }
     } catch (error) {
       console.error("Login error:", error);
       toast.error('An unexpected error occurred');
@@ -47,7 +47,7 @@ export default function LoginPage() {
           <UserIcon
             size={50}
           />
-          <p>Admin Login</p>
+          <p>Login</p>
         </div>
         <div className="flex flex-col gap-2">
           <label
@@ -83,18 +83,15 @@ export default function LoginPage() {
             required
           />
         </div>
-        {isLoading ? (
-          <Loading />
-        ) : (
+        
           <Button onClick={handleLogin} buttonClassName="w-full" disabled={!isFormFilled}>
-            Sign In
+            {!isLoading ? 'Sign In' : 'Signing In...'}
           </Button>
-        )}
+        
+        <p className="text-sm text-[var(--color-4)] dark:text-[var(--color-4)] text-center">
+          Don&apos;t have an account? <a href="/register" className="text-[var(--color-2)] hover:underline">Register</a>
+        </p>
       </form>
     </div>
   );
-}
-
-function Loading() {
-  return <div className="w-full py-2.5 rounded-lg bg-[var(--color-2)] text-white text-center">Loading...</div>;
 }

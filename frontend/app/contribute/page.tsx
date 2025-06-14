@@ -22,7 +22,7 @@ const semesters = ["Select Semester","1", "2", "3", "4", "5", "6", "7", "8"];
 const uploadTypes = ["endsem", "midsem", "lectures", "notes", "other"];
 
 export default function ContributePage() {
-  const { isAuthenticated, user } = useAuth();
+  const { user } = useAuth();
   const router = useRouter();
   const [branchName, setBranchName] = useState(branches[0]);
   const [semesterNumber, setSemesterNumber] = useState(semesters[0]);
@@ -33,10 +33,6 @@ export default function ContributePage() {
   const [subjects, setSubjects] = useState<string[]>([]);
   const [isLoadingSubjects, setIsLoadingSubjects] = useState(false);
 
-  if (!isAuthenticated) {
-    router.push("/login");
-    return null;
-  }
   useEffect(() => {
     const fetchSubjects = async () => {
       setIsLoadingSubjects(true);

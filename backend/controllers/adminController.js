@@ -270,7 +270,6 @@ const getContributionsByBranchAndYear = async (req, res) => {
   }
 };
 
-// Approve a contribution: move PDFs to subject, update DB, delete from contributions folder
 const approveContribution = async (req, res) => {
   try {
     const { id } = req.params;
@@ -282,7 +281,6 @@ const approveContribution = async (req, res) => {
     const { branchName, semesterNumber, subjectName, uploadType, pdfUrls } =
       contribution;
 
-    // Find subject
     const branch = await Branch.findOne({ branchName });
     if (!branch) {
       return res
@@ -307,58 +305,60 @@ const approveContribution = async (req, res) => {
         .json({ message: `Subject '${subjectName}' not found` });
     }
 
-    // Target folder for approved material
     const targetFolder = `${branchName}/${semesterNumber}/${subjectName}/${uploadType}`;
 
-    // For each PDF: copy to new folder in Cloudinary, add to subject, delete from contributions folder
     for (const url of pdfUrls) {
-      // Extract public_id from the original url
-      const matches = url.match(/\/upload\/([^?]+)/);
+      const matches = url.match(/\/upload\/v\d+\/([^\s]+)/);
       if (!matches || !matches[1]) {
         console.warn(`Could not extract public_id from URL: ${url}`);
         continue;
       }
-      const originalPublicId = matches[1].replace(/\.[^/.]+$/, "");
+      let originalPublicId = matches[1].replace(/\.[^/.]+$/, "");
+      console.log("Extracted public ID:", originalPublicId);
 
-      // Download the file from Cloudinary
       const fileBuffer = await fetch(url).then((res) => res.arrayBuffer());
 
-      // Upload to the new folder in Cloudinary
       const fileName = originalPublicId.split("/").pop();
       const dataUri = `data:application/pdf;base64,${Buffer.from(
         fileBuffer
       ).toString("base64")}`;
       const uploadResult = await cloudinary.uploader.upload(dataUri, {
-        resource_type: "raw", // Use "raw" for PDFs
+        resource_type: "raw", 
         folder: targetFolder,
         public_id: fileName,
       });
+      console.log(`Uploaded PDF to Cloudinary: ${uploadResult.secure_url}`);
       const newPdfUrl = uploadResult.secure_url;
 
-      // Add to subject's uploadType array
       if (Array.isArray(subject[uploadType])) {
         subject[uploadType].push(newPdfUrl);
       } else {
         subject[uploadType] = [newPdfUrl];
       }
+      console.log(`Added ${uploadType} PDF to subject:`, newPdfUrl);
 
-      // Delete the original file from the contributions folder in Cloudinary
       try {
-        // Use resource_type: "raw" for PDFs (not "auto")
+        console.log(`Deleting original PDF from Cloudinary: ${url}`);
         const result = await cloudinary.uploader.destroy(originalPublicId, {
           resource_type: "raw",
         });
-        console.log(`Deleted original PDF from Cloudinary: ${url}`, result); // Log the result
-        if (result.result !== "ok") {
-          console.error(`Failed to delete ${url}:`, result); // Log if deletion failed
+        console.log(`Deleted original PDF from Cloudinary: ${url}`, result);
+        if (result.result !== "ok" && result.result !== "not found") {
+          console.error(`Failed to delete ${url}:`, result); 
         }
       } catch (err) {
-        console.error(`Failed to delete from Cloudinary: ${url}`, err);
+        if (err.http_code === 404) {
+          console.log(`Resource not found, skipping deletion: ${url}`);
+        } else {
+          console.error(`Failed to delete from Cloudinary: ${url}`, err);
+        }
       }
     }
 
     await subject.save();
+    console.log(`Subject updated with new ${uploadType} PDFs:`, subject);
     await Contribution.findByIdAndDelete(id);
+    console.log(`Contribution approved and deleted: ${id}`);
 
     res
       .status(200)

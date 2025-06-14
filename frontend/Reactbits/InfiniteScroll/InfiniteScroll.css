@@ -6,6 +6,7 @@
   width: 100%;
   overflow: hidden;
   overscroll-behavior: none;
+  height: 100%;
 }
 
 .infinite-scroll-wrapper::before,

@@ -3,6 +3,8 @@ import { useState } from "react";
 import Button from "@/components/Button";
 import { useRouter } from "next/navigation";
 import { SearchIcon } from "@/components/ui/search";
+import { LoaderPinwheelIcon } from "@/components/ui/loader-pinwheel";
+
 const branches = [
   "Computer Science and Engineering",
   "Electronics",
@@ -18,10 +20,16 @@ const semesters = ["1", "2", "3", "4", "5", "6", "7", "8"];
 export default function VaultPage() {
   const [branch, setBranch] = useState(branches[0]);
   const [semester, setSemester] = useState(semesters[0]);
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
   return (
-    <div className="flex flex-col items-center min-h-[80vh] py-12 gap-10">
+    <div className="flex flex-col items-center min-h-[80vh] py-12 gap-10 relative">
+      {isLoading && (
+        <div className="fixed top-0 left-0 w-full h-full flex flex-col items-center justify-center bg-black/50 z-50">
+          <LoaderPinwheelIcon color="white" />
+        </div>
+      )}
       <h1 className="text-6xl md:text-7xl font-extrabold text-center text-[var(--color-4)] mb-4 tracking-tight drop-shadow-white">
         The Vault
       </h1>
@@ -33,6 +41,7 @@ export default function VaultPage() {
           className="flex  items-center justify-between gap-6 bg-black/40 p-8 rounded-xl shadow-lg"
           onSubmit={(e) => {
             e.preventDefault();
+            setIsLoading(true);
             router.push(`/material/${encodeURIComponent(branch)}/${semester}`);
           }}
         >
@@ -79,7 +88,7 @@ export default function VaultPage() {
             </div>
           </div>
           <div className="mt-4 md:mt-7">
-            <Button><SearchIcon/></Button>
+            <Button type="submit"><SearchIcon/></Button>
           </div>
         </form>
       </div>

@@ -1,6 +1,5 @@
 "use client";
 import { createContext, useState, useEffect, useContext, useCallback } from 'react';
-
 interface User {
   id: string;
   email: string;
@@ -16,7 +15,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   user: User | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<boolean>; // Change return type to Promise<boolean>
   logout: () => void;
 }
 
@@ -24,7 +23,7 @@ const AuthContext = createContext<AuthContextType>({
   isAuthenticated: false,
   user: null,
   loading: true,
-  login: async () => { }, // Dummy function
+  login: async () => { return false }, // Dummy function
   logout: () => { }
 });
 
@@ -73,8 +72,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     checkAuth();
   }, []);
 
-  const login = useCallback(async (email: string, password: string) => {
+  const login = useCallback(async (email: string, password: string): Promise<boolean> => { // Add return type to function signature
     try {
+
       const response = await fetch("http://localhost:8000/api/auth/login", {
         method: "POST",
         headers: {
@@ -84,28 +84,34 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       });
 
       if (response.ok) {
+        console.log("Login successful, processing response...");
         const data = await response.json();
         localStorage.setItem('token', data.token);
         setIsAuthenticated(true);
         setUser(data.user);
+        return true; // Return true on successful login
       } else {
         setIsAuthenticated(false);
         setUser(null);
         localStorage.removeItem('token');
         console.error("Login failed");
+        return false; // Return false on failed login
       }
     } catch (error) {
       console.error("Login error:", error);
       setIsAuthenticated(false);
       setUser(null);
       localStorage.removeItem('token');
+      return false; // Return false on error
     }
   }, []);
 
   const logout = useCallback(() => {
     localStorage.removeItem('token');
+
     setIsAuthenticated(false);
     setUser(null);
+
   }, []);
 
   const value: AuthContextType = {

@@ -14,6 +14,7 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
   const [expandedRequestId, setExpandedRequestId] = useState<string | null>(null);
   const [userDetails, setUserDetails] = useState<Record<string, any>>({});
+  const [approvingContributionId, setApprovingContributionId] = useState<string | null>(null);
 
   // Only allow admins
   useEffect(() => {
@@ -83,6 +84,37 @@ export default function AdminPage() {
     }
   };
 
+  const approveContribution = async (id: string) => {
+    setApprovingContributionId(id);
+    try {
+      const res = await fetch(
+        `http://localhost:8000/api/admin/approveContribution/${id}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      if (res.ok) {
+        toast.success("Contribution approved successfully!");
+        // Refresh requests after approval
+        const updatedRequests = requests.filter((req) => req._id !== id);
+        setRequests(updatedRequests);
+      } else {
+        const errorData = await res.json();
+        toast.error(
+          `Failed to approve contribution: ${errorData.message || "Unknown error"
+          }`
+        );
+      }
+    } catch (err: any) {
+      toast.error(`Failed to approve contribution: ${err.message}`);
+    } finally {
+      setApprovingContributionId(null);
+    }
+  };
+
   // Placeholder handlers for upload and add subject
   const handleUploadMaterial = () => {
     toast.info("Upload Material clicked");
@@ -111,7 +143,7 @@ export default function AdminPage() {
           {loading ? (
             <div>Loading...</div>
           ) : requests.length === 0 ? (
-            <div>No requests found for your branch and year.</div>
+            <div className="text-white w-full h-full flex items-center justify-center">No requests found for your branch and year.</div>
           ) : (
             <ul className="space-y-4 max-h-72 overflow-y-auto">
               {requests.map((req) => {
@@ -159,7 +191,7 @@ export default function AdminPage() {
                           <div className="flex gap-4 w-full">
                             <div className="mb-5 w-[70%] text-[0.5rem]">
                               <div className="font-semibold text-xl text-[var(--color-3)]">
-                                Request Details
+                                Contribution Details
                               </div>
                               <div className="text-white text-sm">
                                 <div>
@@ -239,7 +271,14 @@ export default function AdminPage() {
                             </div>
                           </div>
                           <div className="my-4 flex justify-end gap-4">
-                            <Button>Approve</Button>
+                            <Button
+                              disabled={!!approvingContributionId}
+                              onClick={() => approveContribution(req._id)}
+                            >
+                              {approvingContributionId === req._id
+                                ? "Approving..."
+                                : "Approve"}
+                            </Button>
                             <Button backgroundColor="red">Reject</Button>
                           </div>
                         </motion.div>
