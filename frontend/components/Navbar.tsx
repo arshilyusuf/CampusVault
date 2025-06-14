@@ -19,7 +19,7 @@ export default function Navbar() {
   const [showProfileTooltip, setShowProfileTooltip] = useState(false);
 
   return (
-    <nav className="flex items-center justify-between p-6 text-white">
+    <nav className="flex items-center justify-between px-6 py-7 text-white">
       <Link
         href="/"
         className="text-[2rem] font-[900] flex gap-2 items-center"
@@ -30,7 +30,7 @@ export default function Navbar() {
           <p>Vault</p>
         </div>
       </Link>
-      <div className="flex space-x-10">
+      <div className="flex space-x-10 px-6 py-3 bg-[var(--color-3)]/5 backdrop-blur-3xl rounded-full">
         {/* Vault Icon */}
         <div
           className="relative flex items-center"
