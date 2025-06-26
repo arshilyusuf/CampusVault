@@ -1,8 +1,8 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const Contribution = require("../models/Contribution"); // Assuming you'll create a Contribution model
-const cloudinary = require("../utils/cloudinary"); // Assuming you have a cloudinary config
+const Contribution = require("../models/Contribution"); 
+const cloudinary = require("../utils/cloudinary"); 
 
 const registerUser = async (req, res) => {
   try {

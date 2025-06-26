@@ -89,7 +89,7 @@ export default function LoginPage() {
           </Button>
         
         <p className="text-sm text-[var(--color-4)] dark:text-[var(--color-4)] text-center">
-          Don&apos;t have an account? <a href="/register" className="text-[var(--color-2)] hover:underline">Register</a>
+          Don&apos;t have an account? <a href="/signup" className="text-[var(--color-2)] hover:underline">Register</a>
         </p>
       </form>
     </div>

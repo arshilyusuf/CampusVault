@@ -73,7 +73,11 @@ body {
 main{
   width: 80%;
 }
-
+@media screen and (max-width: 768px) {
+  main {
+    width: 100%;
+  }
+}
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
