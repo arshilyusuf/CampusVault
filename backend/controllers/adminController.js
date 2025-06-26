@@ -93,7 +93,6 @@ const getAllBranches = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
-
 const uploadPdfs = upload.array('pdfFiles');
 
 const uploadPdfToCloudinary = async (file, folderPath) => {
@@ -491,6 +490,64 @@ const addSubject = async (req, res) => {
   }
 };
 
+// Delete a material from Cloudinary and remove its link from the subject in the database
+const deleteMaterial = async (req, res) => {
+  console.log("Delete Material Called")
+  try {
+    console.log(req.body)
+    const { branchName, semesterNumber, subjectName, uploadType, materialUrl } = req.body;
+    if (!branchName || !semesterNumber || !subjectName || !uploadType || !materialUrl) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    // Find the subject
+    const subject = await Subject.findOne({ name: subjectName, branchName: branchName, semesterNumber: semesterNumber });
+    if (!subject) {
+      return res.status(404).json({ message: `Subject '${subjectName}' not found` });
+    }
+
+    // Remove the material URL from the subject's uploadType array
+    if (!Array.isArray(subject[uploadType])) {
+      return res.status(400).json({ message: `No materials found for upload type '${uploadType}'` });
+    }
+    const index = subject[uploadType].indexOf(materialUrl);
+    if (index === -1) {
+      return res.status(404).json({ message: "Material URL not found in subject" });
+    }
+    subject[uploadType].splice(index, 1);
+
+    // Extract public_id from the Cloudinary URL
+    const matches = materialUrl.match(/\/upload\/v\d+\/([^\s]+)/);
+    if (!matches || !matches[1]) {
+      console.warn(`Could not extract public_id from URL: ${materialUrl}`);
+      return res
+        .status(400)
+        .json({ message: "Could not extract public_id from URL" });
+    }
+    let publicId = matches[1].replace(/\.[^/.]+$/, "");
+
+    // Delete from Cloudinary
+    try {
+      const result = await cloudinary.uploader.destroy(publicId, { resource_type: "raw" });
+      if (result.result !== "ok" && result.result !== "not found") {
+        return res.status(500).json({ message: "Failed to delete material from Cloudinary", result });
+      }
+    } catch (err) {
+      if (err.http_code === 404) {
+        // Resource not found, continue
+      } else {
+        return res.status(500).json({ message: "Error deleting from Cloudinary", error: err });
+      }
+    }
+
+    // Save the subject
+    await subject.save();
+    res.status(200).json({ message: "Material deleted successfully" });
+  } catch (err) {
+    console.error("Error deleting material:", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
 
 module.exports = {
   addBranch,
@@ -502,4 +559,5 @@ module.exports = {
   approveContribution,
   rejectContribution,
   addSubject,
+  deleteMaterial
 };

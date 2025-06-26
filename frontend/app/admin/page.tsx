@@ -32,7 +32,7 @@ export default function AdminPage() {
   const [pdfFiles, setPdfFiles] = useState<File[]>([]);
   const [subjects, setSubjects] = useState<string[]>([]);
   const [isLoadingSubjects, setIsLoadingSubjects] = useState(false);
-
+  const [materialRequests, setMaterialRequests] = useState<any[]>();
   // Only allow admins
   useEffect(() => {
     if (!isAuthenticated) {
@@ -92,7 +92,6 @@ export default function AdminPage() {
             data.subjects.map((subject: { name: string }) => subject.name)
           );
         } else {
-          
           setSubjects([]);
         }
       } catch (error) {
@@ -105,6 +104,41 @@ export default function AdminPage() {
     fetchSubjects();
   }, [user?.branchName, semesterNumber]);
 
+  useEffect(() => {
+    const fetchRequests = async () => {
+      if (!user?.branchName || !user?.yearNumber) return;
+      setLoading(true);
+      try {
+        console.log(
+          `http://localhost:8000/api/requests/${encodeURIComponent(
+            user.branchName
+          )}/${user.yearNumber}`
+        );
+        const res = await fetch(
+          `http://localhost:8000/api/requests/${encodeURIComponent(
+            user.branchName
+          )}/${user.yearNumber}`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+        if (res.ok) {
+          const data = await res.json();
+          console.log("Actual response data:", data);
+          setMaterialRequests(data);
+        } else {
+          setMaterialRequests([]);
+        }
+      } catch (err) {
+        setMaterialRequests([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    if (user?.branchName && user?.yearNumber) fetchRequests();
+  }, [user]);
   const handleExpand = async (req: any) => {
     if (expandedRequestId === req._id) {
       setExpandedRequestId(null);
@@ -204,7 +238,12 @@ export default function AdminPage() {
   };
 
   const handleSubmitMaterial = async () => {
-    if (!semesterNumber || !subjectName || !uploadType || pdfFiles.length === 0) {
+    if (
+      !semesterNumber ||
+      !subjectName ||
+      !uploadType ||
+      pdfFiles.length === 0
+    ) {
       toast.error("All fields are required");
       return;
     }
@@ -243,7 +282,7 @@ export default function AdminPage() {
       }
     } catch (err: any) {
       toast.error(`Failed to upload material: ${err.message}`);
-    }finally {
+    } finally {
       setProcessingRequest(false);
     }
   };
@@ -281,7 +320,7 @@ export default function AdminPage() {
       }
     } catch (err: any) {
       toast.error(`Failed to add subject: ${err.message}`);
-    }finally{
+    } finally {
       setProcessingRequest(false);
     }
   };
@@ -313,7 +352,7 @@ export default function AdminPage() {
               No requests found for your branch and year.
             </div>
           ) : (
-            <ul className="space-y-4 max-h-72 overflow-y-auto">
+            <ul className="space-y-4 max-h-92 overflow-y-auto">
               {requests.map((req) => {
                 const isExpanded = expandedRequestId === req._id;
                 const userId = req.requestingUser || req.userId;
@@ -446,9 +485,15 @@ export default function AdminPage() {
                               }
                               onClick={() => approveContribution(req._id)}
                             >
-                              {approvingContributionId === req._id
-                                ? "Approving..."
-                                : `Approve ${(<CheckIcon size={20} />)}`}
+                              <div className="flex items-center gap-1">
+                                {approvingContributionId === req._id ? (
+                                  "Approving..."
+                                ) : (
+                                  <>
+                                    Approve <CheckIcon size={20} />
+                                  </>
+                                )}
+                              </div>
                             </Button>
                             <Button
                               onClick={() => rejectContribution(req._id)}
@@ -458,7 +503,9 @@ export default function AdminPage() {
                                 approvingContributionId === req._id
                               }
                             >
-                              Reject {<XIcon size={20} />}
+                              <div className="flex gap-1 items-center">
+                                Reject{<XIcon size={20} />}
+                              </div>
                             </Button>
                           </div>
                         </motion.div>
@@ -595,9 +642,82 @@ export default function AdminPage() {
           </Button>
         </div>
         <div className="bg-black/40 rounded-2xl p-6 shadow-lg backdrop-blur-md flex flex-col items-left justify-center col-span-2 row-span-1 col-start-3 row-start-4 shadow-white/5">
-          <h2 className="text-2xl font-semibold text-[var(--white)]">
-            Delete Material
+          <h2 className="text-2xl font-semibold text-[var(--white)] mb-4 flex items-center gap-2">
+            Material Requests
+            {materialRequests?.length > 0 && (
+              <div className="w-5 h-5 flex items-center justify-center rounded-full text-sm font-semibold bg-yellow-400 text-black">
+                {materialRequests.length}
+              </div>
+            )}
           </h2>
+          {loading ? (
+            <div className="text-white">Loading...</div>
+          ) : !materialRequests || materialRequests.length === 0 ? (
+            <div className="text-white w-full h-[60px] flex items-center justify-center">
+              No material requests found for your branch and year.
+            </div>
+          ) : (
+            <ul className="space-y-3 max-h-60 overflow-y-auto">
+              {materialRequests.map((req) => (
+                <li
+                  key={req._id}
+                  className="border-b border-gray-700 pb-2 flex flex-col"
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="font-bold text-[var(--color-3)]">
+                        {req.subjectName}
+                      </span>
+                      <span className="ml-2 text-white/80">
+                        Semester: <b>{req.semesterNumber}</b> | Type:{" "}
+                        <b>{req.uploadType}</b>
+                      </span>
+                    </div>
+                    <span className="text-xs text-white/50">
+                      {new Date(req.createdAt).toLocaleDateString()}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={async () => {
+                        try {
+                          const res = await fetch(
+                            `http://localhost:8000/api/requests/deleteRequestAndNotify/${req._id}`,
+                            {
+                              method: "DELETE",
+
+                              headers: {
+                                Authorization: `Bearer ${localStorage.getItem(
+                                  "token"
+                                )}`,
+                              },
+                            }
+                          );
+                          
+                          
+                        
+                          if (res.ok) {
+                            toast.success("Request Resolved !");
+                            setMaterialRequests((prev) =>
+                              prev?.filter((item) => item._id !== req._id)
+                            );
+                          } else {
+                            toast.error("Failed to resolve Request");
+                          }
+                        } catch (err) {
+                          console.error(err);
+                          toast.error("Failed to resolve Request");
+                        }
+                      }}
+                      className="mt-2 self-start text-sm bg-[var(--color-3)] hover:bg-[var(--color-2)] text-black p-2 rounded transition-all duration-200 flex gap-2 items-center"
+                    >
+                      Complete Request {<CheckIcon size={17} />}
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </div>
     </div>

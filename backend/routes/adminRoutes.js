@@ -20,4 +20,5 @@ router.post("/addSubject", adminController.addSubject);
 router.get("/contributions/:branchName/:yearNumber", adminController.getContributionsByBranchAndYear);
 router.get("/approveContribution/:id", adminController.approveContribution);
 router.get("/rejectContribution/:id", adminController.rejectContribution);
+router.post("/deleteMaterial", adminController.deleteMaterial);
 module.exports = router;

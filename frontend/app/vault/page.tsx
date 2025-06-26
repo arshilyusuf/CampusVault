@@ -6,6 +6,7 @@ import { SearchIcon } from "@/components/ui/search";
 import { LoaderPinwheelIcon } from "@/components/ui/loader-pinwheel";
 
 const branches = [
+  "Select Branch",
   "Computer Science and Engineering",
   "Electronics",
   "Mechanical",
@@ -15,10 +16,10 @@ const branches = [
   "Other",
 ];
 
-const semesters = ["1", "2", "3", "4", "5", "6", "7", "8"];
+const semesters = ["Select Semester","1", "2", "3", "4", "5", "6", "7", "8"];
 
 export default function VaultPage() {
-  const [branch, setBranch] = useState(branches[0]);
+  const [branch, setBranch] = useState("branches[0]");
   const [semester, setSemester] = useState(semesters[0]);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();

@@ -94,7 +94,7 @@ export default function Subject({ subject }) {
                 {pdftypes.map((uploadtype) => {
                   return (
                     <li key={uploadtype} className="mb-2">
-                      {" "}
+                      
                       <PDFLink
                         subject={subjectDetails}
                         uploadtype={uploadtype}
