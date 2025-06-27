@@ -48,8 +48,8 @@ export default function Navbar() {
   return (
     <>
       {/* 🧱 Sticky container */}
-      <div className="sticky sm:relative top-0 z-50 sm:bg-transparent sm:backdrop-blur-none bg-black/60 backdrop-blur-lg">
-        <nav className="flex items-center justify-between px-6 py-7 text-white">
+      <div className="sticky sm:h-fit sm:relative top-0 z-50 sm:bg-transparent sm:backdrop-blur-none bg-black/60 backdrop-blur-lg">
+        <nav className="flex items-center justify-between px-6 py-3 sm:py-7 text-white ">
           {/* Logo */}
           <Link
             href="/"

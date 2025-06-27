@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import Image from "next/image";
 import SplitText from "@/Reactbits/SplitText/SplitText";
 import Magnet from "@/Reactbits/Magnet/Magnet";
@@ -7,33 +7,28 @@ import ContributeSection from "@/components/ContributeSection";
 import Features from "@/components/Features";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-function useIsMobile(query = "(max-width: 768px)") {
-  const [isMobile, setIsMobile] = useState(false);
+
+export default function Home() {
+  const [textAlign, setTextAlign] = useState("left");
+  const [hasMounted, setHasMounted] = useState(false);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    setHasMounted(true);
+    if (window.innerWidth < 640) {
+      setTextAlign("center");
+    } else {
+      setTextAlign("left");
+    }
+  }, []);
 
-    const media = window.matchMedia(query);
-    const handleChange = () => setIsMobile(media.matches);
-
-    handleChange(); // Set initial value
-    media.addEventListener("change", handleChange);
-
-    return () => media.removeEventListener("change", handleChange);
-  }, [query]);
-
-  return isMobile;
-}
-export default function Home() {
-  const isMobile = useIsMobile();
-  const textAlign = isMobile ? "center" : "left";
+  if (!hasMounted) return null;
   return (
     <div className="flex flex-col items-center justify-center">
       {/* 🔥 Responsive wrapper */}
-      <div className="flex flex-col sm:flex-row items-center sm:items-start justify-between mb-[6rem] sm:mt-[6rem] mt-[2rem] gap-10 px-8 sm:px-0">
+      <div className="flex flex-col sm:flex-row items-center sm:items-start justify-between mb-[6rem] sm:mt-[6rem] mt-[4rem] gap-10 px-5 sm:px-0">
         {/* 🪄 Heading block */}
         <div className="flex flex-col items-start justify-center gap-10 w-full sm:w-auto">
-          <div className="text-[2.3rem] sm:text-[6rem] font-[800] tracking-[-0.1rem] sm:tracking-[-0.3rem] leading-[3rem] sm:leading-[5rem] w-full sm:w-[40rem] text-[var(--color-4)] flex flex-col items-center justify-center sm:flex-none sm:items-start sm:justify-start">
+          <div className="text-[3.4rem] sm:text-[6rem] font-[800] tracking-[-0.1rem] sm:tracking-[-0.3rem] leading-[2.6rem] sm:leading-[5rem] w-full sm:w-[40rem] text-[var(--color-4)] flex flex-col items-center justify-center sm:flex-none sm:items-start sm:justify-start">
             <SplitText
               text="Your Central Hub for"
               delay={100}
@@ -58,6 +53,7 @@ export default function Home() {
                 threshold={0.1}
                 rootMargin="-100px"
                 textAlign={textAlign}
+                className="text-[3.2rem]"
               />
             </div>
             <SplitText
@@ -71,6 +67,7 @@ export default function Home() {
               threshold={0.1}
               rootMargin="-100px"
               textAlign={textAlign}
+              className="mb-0 mt-0"
             />
           </div>
           <div className="w-full sm:w-[60%] text-center sm:text-left">
@@ -90,26 +87,30 @@ export default function Home() {
           </div>
         </div>
         <AnimatedContent
-          distance={150}
-          direction="horizontal"
+          distance={40}
+          direction={textAlign === "center" ? "vertical" : "horizontal"}
           reverse={false}
           duration={1.2}
           ease="bounce.out"
           initialOpacity={0.2}
           animateOpacity
-          scale={1.1}
-          threshold={0.2}
+          scale={1.4}
+          threshold={0.1}
           delay={0.3}
         >
-          <Magnet padding={100} disabled={false} magnetStrength={10}>
+          <Magnet
+            disabled={false}
+            magnetStrength={10}
+            
+          >
             <Link href="/vault" title="Take me to the Vault!">
               <div className="">
                 <Image
                   src="/Chill-Time.svg"
                   alt="Chill Time"
-                  width={200} // mobile-friendly size
+                  width={200}
                   height={200}
-                  className="sm:w-[300px] sm:h-[300px] w-50 h-50"
+                  className="sm:w-[350px] sm:h-[350px]"
                   style={{
                     filter:
                       "invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%)",
@@ -122,12 +123,12 @@ export default function Home() {
       </div>
 
       {/* 📦 Features */}
-      <div className="flex items-center justify-center w-full mt-[7rem] rounded-5xl">
+      <div className="flex items-center justify-center w-full mt-[7rem]">
         <Features />
       </div>
-
+      {/* <div className="flex items-center justify-center w-full mt-[7rem]"> */}
       <ContributeSection />
+      {/* </div> */}
     </div>
   );
-  
 }

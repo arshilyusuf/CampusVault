@@ -326,17 +326,17 @@ export default function AdminPage() {
   };
 
   return (
-    <div className="min-h-[90vh] p-8 backdrop-blur-3xl bg-[var(--color-3)]/10  rounded-4xl">
+    <div className="min-h-[90vh] p-3 pt-7 sm:p-8 backdrop-blur-3xl bg-[var(--color-3)]/10 mt-5 sm:mt-0 rounded-4xl">
       <h1 className="text-4xl font-bold mb-8 text-center text-[var(--white)]">
         Admin Dashboard
       </h1>
       <div
-        className="grid w-full grid-cols-4 grid-rows-4 gap-8"
-        style={{ minHeight: "60vh", maxHeight: "170vh" }}
+        className="grid w-full grid-cols-4 grid-rows-6 sm:grid-rows-4 gap-8"
+        style={{ minHeight: "60vh"}}
       >
         {/* Contribution Requests: spans 2 columns in row 1 */}
         <div className="bg-black rounded-2xl p-6 shadow-lg backdrop-blur-md flex flex-col col-span-4 row-span-2 col-start-1 row-start-1">
-          <h2 className="flex items-center justify-center gap-2 text-3xl w-fit pb-2 font-semibold mb-4 border-b-4 border-b-[var(--color-3)] text-[var(--color-3)]">
+          <h2 className="flex items-center justify-center gap-2 text-2xl sm:text-3xl w-fit pb-2 font-semibold mb-4 border-b-4 border-b-[var(--color-3)] text-[var(--color-3)]">
             Contribution Requests
             {requests?.length > 0 && (
               <div className="w-5 h-5 flex items-center justify-center rounded-full text-sm font-semibold bg-yellow-400 text-black">
@@ -517,8 +517,8 @@ export default function AdminPage() {
             </ul>
           )}
         </div>
-        <div className="bg-black/40 rounded-2xl p-6 shadow-lg backdrop-blur-md flex flex-col items-left justify-between col-span-2 row-span-2 col-start- row-start-3 shadow-white/5">
-          <h2 className="text-2xl font-semibold mb-[-2rem] text-[var(--white)]">
+        <div className="bg-black/40 rounded-2xl p-6 shadow-lg backdrop-blur-md flex flex-col items-left justify-between col-span-4 sm:col-span-2 row-span-2 col-start-1 row-start-3 shadow-white/5">
+          <h2 className="text-2xl font-semibold mb-[-1rem] sm:mb-[-2rem] text-[var(--white)]">
             Upload Material
           </h2>
           <p className="text-sm text-white/30 ">
@@ -609,7 +609,7 @@ export default function AdminPage() {
             </div>
           </Button>
         </div>
-        <div className="bg-black/40 rounded-2xl p-6 shadow-lg backdrop-blur-md flex flex-col items-left justify-center col-span-2 row-span-1 col-start-3 row-start-3 shadow-white/5">
+        <div className="bg-black/40 rounded-2xl p-6 shadow-lg backdrop-blur-md flex flex-col items-left justify-center col-span-4 sm:col-span-2 sm:row-span-1 col-start-1 sm:col-start-3 row-start-5 sm:row-start-3 shadow-white/5">
           <h2 className="text-2xl font-semibold text-[var(--white)]">
             Add New Subject
           </h2>
@@ -641,7 +641,7 @@ export default function AdminPage() {
             <div className="flex justify-center">{<PlusIcon size={25} />}</div>
           </Button>
         </div>
-        <div className="bg-black/40 rounded-2xl p-6 shadow-lg backdrop-blur-md flex flex-col items-left justify-center col-span-2 row-span-1 col-start-3 row-start-4 shadow-white/5">
+        <div className="bg-black/40 rounded-2xl p-6 shadow-lg backdrop-blur-md flex flex-col items-left justify-center col-span-4 sm:col-span-2 sm:row-span-1 col-start-1 sm:col-start-3 row-start-6 sm:row-start-4 shadow-white/5">
           <h2 className="text-2xl font-semibold text-[var(--white)] mb-4 flex items-center gap-2">
             Material Requests
             {materialRequests?.length > 0 && (
@@ -693,9 +693,7 @@ export default function AdminPage() {
                               },
                             }
                           );
-                          
-                          
-                        
+
                           if (res.ok) {
                             toast.success("Request Resolved !");
                             setMaterialRequests((prev) =>

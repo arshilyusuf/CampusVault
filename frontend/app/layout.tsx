@@ -31,8 +31,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        style={{ position: "relative", minHeight: "100vh" }}
-        className={`${hostGrotesk.variable} ${geistMono.variable} antialiased`}
+        
+        className={`relative min-h-screen ${hostGrotesk.variable} ${geistMono.variable} antialiased`}
       >
         <AuthProvider>
           <div

@@ -50,13 +50,13 @@ const MaterialPage = () => {
   }, [branchName, semesterNumber]);
 
   return (
-    <div className="mt-4 relative">
+    <div className="mt-4 relative sm:px-0 px-5">
       {loading && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 bg-opacity-60">
           <Loading />
         </div>
       )}
-      <h1 className="text-4xl text-white font-bold border-b-5 border-b-[white] pb-4">
+      <h1 className="text-2xl sm:text-4xl text-white font-bold border-b-5 border-b-[white] pb-4">
         {branchName} - Semester {semester}
       </h1>
       {subjects.length > 0 ? (
@@ -68,7 +68,7 @@ const MaterialPage = () => {
           onItemSelect={(item) => console.log(item)}
           showGradients={true}
           enableArrowNavigation={true}
-          className="flex flex-col gap-4 mt-4 h-150 "
+          className="flex flex-col gap-1 sm:gap-4 mt-4 h-fit sm:h-150 "
           itemClassName="w-[100%] rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200"
           displayScrollbar={true}
         />

@@ -55,7 +55,7 @@ export default function ContributeSection() {
       <div ref={textRef} className="opacity-0">
         <SplitText
           text="Want to contribute? Join us in building a comprehensive repository of semester-wise study materials!"
-          className="text-[3rem] font-[500] tracking-[-0.1rem] leading-[3rem] w-full text-[var(--color-4)] text-center"
+          className="px-6 sm:px-0 text-[2.5rem] sm:text-[3rem] font-[500] tracking-[-0.1rem] leading-[3rem] w-full text-[var(--color-4)] text-center"
           delay={100}
           duration={0.6}
           ease="power3.out"

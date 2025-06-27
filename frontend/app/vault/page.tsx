@@ -34,19 +34,19 @@ export default function VaultPage() {
       <h1 className="text-6xl md:text-7xl font-extrabold text-center text-[var(--color-4)] mb-4 tracking-tight drop-shadow-white">
         The Vault
       </h1>
-      <div className="p-10 bg-black/20 rounded-3xl flex flex-col gap-3 backdrop-blur-2xl">
+      <div className="p-5 sm:p-10  bg-black/20 rounded-3xl flex flex-col gap-3 backdrop-blur-2xl">
         <h2 className="text-2xl md:text-2xl font-bold text-center text-[#f2f2f2] tracking-tight">
           Search for your required material by your branch and semester
         </h2>
         <form
-          className="flex  items-center justify-between gap-6 bg-black/40 p-8 rounded-xl shadow-lg"
+          className="flex flex-col sm:flex-row  items-center justify-between gap-6 bg-black/40 p-8 rounded-xl shadow-lg"
           onSubmit={(e) => {
             e.preventDefault();
             setIsLoading(true);
             router.push(`/material/${encodeURIComponent(branch)}/${semester}`);
           }}
         >
-          <div className="flex gap-4">
+          <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex flex-col gap-2">
               <label
                 htmlFor="branch"

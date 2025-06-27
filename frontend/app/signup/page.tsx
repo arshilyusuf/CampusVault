@@ -66,8 +66,8 @@ const [processing, setProcessing] = useState(false);
   };
 
   return (
-    <div className="w-full h-[80vh] flex p-10 ">
-      <div className="w-full h-full bg-black/70 relative overflow-hidden ">
+    <div className="w-full min-h-[80vh] flex flex-col sm:flex-row p-4 sm:p-10">
+      <div className="w-full sm:w-1/2 h-[15rem] sm:h-full bg-black/70 relative overflow-hidden rounded-t-3xl sm:rounded-none">
         <div className="absolute inset-0 bg-gradient-to-tr from-black via-transparent to-transparent z-10 pointer-events-none"></div>
         <Silk
           speed={5}
@@ -76,22 +76,23 @@ const [processing, setProcessing] = useState(false);
           noiseIntensity={1.5}
           rotation={0}
         />
-
-        <h2 className="absolute top-0 z-1900 text-white text-[3rem] tracking-tight leading-10 font-bold p-8">
+        <h2 className="absolute top-0 z-19 text-white text-[1.8rem] sm:text-[3rem] tracking-tight leading-8 sm:leading-10 font-bold p-5 sm:p-8">
           Get access to all materials here in one place with just a simple sign
           up
         </h2>
       </div>
 
-      <div className="w-full h-full bg-[var(--white)]/98 p-5 flex flex-col justify-center rounded-tr-3xl rounded-br-3xl">
-        <WaypointsIcon size={40} />
-        <h2 className="text-[var(--black)] font-bold text-[2rem] mb-4">
-          Get Started
-        </h2>
+      <div className="w-full sm:w-1/2 h-auto bg-[var(--white)]/98 p-5 flex flex-col justify-center rounded-b-3xl sm:rounded-none sm:rounded-tr-3xl sm:rounded-br-3xl">
+        <div className="pl-3 mb-3 sm:mb-5">
+          <WaypointsIcon size={40} />
+          <h2 className="text-[var(--black)] font-bold text-[1.5rem] sm:text-[2rem] mt-2">
+            Get Started
+          </h2>
+        </div>
 
         <form
           onSubmit={handleSubmit}
-          className="p-4 rounded-xl grid grid-cols-1 md:grid-cols-2 gap-4 text-sm"
+          className="p-1 sm:p-4 rounded-xl grid grid-cols-1 md:grid-cols-2 gap-4 text-sm"
         >
           <div className="flex flex-col">
             <label htmlFor="email" className="text-gray-700 mb-1">
@@ -217,4 +218,5 @@ const [processing, setProcessing] = useState(false);
       </div>
     </div>
   );
+  
 }

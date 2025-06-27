@@ -135,17 +135,14 @@ export default function ContributePage() {
 
   return (
     <div
-      className="flex items-left justify-between  min-h-[80vh] rounded-4xl gap-8 backdrop-blur-3xl"
-      style={{
-        background:
-          "linear-gradient(135deg,#c7ff1bbd 20%, transparent 120%),  #000000ba ",
-      }}
+      className="flex bg-black/10 flex-col-reverse sm:flex-row items-left mt-5 sm:mt-0 justify-between min-h-[80vh] rounded-4xl gap-8 backdrop-blur-3xl p-4 sm:p-0"
+     
     >
       <form
         onSubmit={handleSubmit}
-        className="flex flex-col w-[60%] overflow-hidden overflow-y-auto gap-6 p-8 pt-15 bg-black rounded-4xl rounded-tr-[5rem] rounded-br-[5rem]"
+        className="flex flex-col w-full sm:w-[60%] overflow-hidden overflow-y-auto gap-6 p-6 sm:p-8 pt-10 sm:pt-15 bg-black rounded-3xl sm:rounded-4xl sm:rounded-tr-[5rem] sm:rounded-br-[5rem]"
       >
-        <label className="block text-5 font-bold  text-white">
+        <label className="block text-sm sm:text-5 font-bold text-white">
           Branch:
           <select
             value={branchName}
@@ -159,6 +156,7 @@ export default function ContributePage() {
             ))}
           </select>
         </label>
+
         <label className="block text-sm font-medium text-white">
           Semester:
           <select
@@ -173,6 +171,7 @@ export default function ContributePage() {
             ))}
           </select>
         </label>
+
         <label className="block text-sm font-medium text-white">
           Subject Name:
           {isLoadingSubjects ? (
@@ -193,6 +192,7 @@ export default function ContributePage() {
             </select>
           )}
         </label>
+
         <label className="block text-sm font-medium text-white">
           Upload Type:
           <select
@@ -207,6 +207,7 @@ export default function ContributePage() {
             ))}
           </select>
         </label>
+
         <label className="block text-sm font-medium text-white">
           PDF Files:
           <input
@@ -214,13 +215,14 @@ export default function ContributePage() {
             multiple
             onChange={handleFileChange}
             className="mt-1 block w-full text-white file:mr-4 file:py-2 file:px-4
-      file:rounded-full file:border-0
-      file:text-sm file:font-semibold
-      file:bg-green-50 file:text-green-700
-      hover:file:bg-green-100"
+              file:rounded-full file:border-0
+              file:text-sm file:font-semibold
+              file:bg-green-50 file:text-green-700
+              hover:file:bg-green-100"
             accept=".pdf, .ppt, .pptx"
           />
         </label>
+
         {pdfFiles.length > 0 && (
           <div>
             <p className="text-sm font-medium text-white">Selected Files:</p>
@@ -233,17 +235,20 @@ export default function ContributePage() {
             </ul>
           </div>
         )}
+
         <Button type="submit" buttonClassName="w-full" disabled={isSubmitting}>
           {isSubmitting ? "Submitting..." : "Submit Contribution"}
         </Button>
       </form>
-      <h1 className="text-4xl flex flex-col font-black text-right mt-7 tracking-tight mr-10 text-[var(--black]">
+
+      <h1 className="text-3xl ml-3 sm:ml-0 sm:text-4xl flex flex-col font-black text-left sm:text-right mt-3 sm:mt-7 tracking-tight sm:mr-10 text-[var(--white)]">
         Contribute Material
-        <span className="text-lg font-thin text-white mt-3">
+        <span className="text-base sm:text-lg font-thin text-white mt-3">
           Select your branch, semester, and subject to send a contribution
           request. Your request will be reviewed by the admins.
         </span>
       </h1>
     </div>
   );
+  
 }
