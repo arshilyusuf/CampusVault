@@ -17,9 +17,9 @@ const branches = [
   "Other",
 ];
 
-export const semesters = ["Select Semester","1", "2", "3", "4", "5", "6", "7", "8"];
+const semesters = ["Select Semester","1", "2", "3", "4", "5", "6", "7", "8"];
 
-export const uploadTypes = ["endsem", "midsem", "lectures", "notes", "other"];
+const uploadTypes = ["endsem", "midsem", "lectures", "notes", "other"];
 
 export default function ContributePage() {
   const { user } = useAuth();
