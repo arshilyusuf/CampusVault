@@ -7,7 +7,7 @@ export default function Button({
   backgroundColor = "var(--color-3)",
 }: {
   children: React.ReactNode;
-  onClick: () => void;
+  onClick?: () => void;
   buttonClassName?: string;
   disabled?: boolean;
   type?: "button" | "submit" | "reset";

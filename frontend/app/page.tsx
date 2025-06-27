@@ -9,7 +9,8 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 export default function Home() {
-  const [textAlign, setTextAlign] = useState("left");
+  const [textAlign, setTextAlign] =
+    useState<React.CSSProperties["textAlign"]>("left");
   const [hasMounted, setHasMounted] = useState(false);
 
   useEffect(() => {

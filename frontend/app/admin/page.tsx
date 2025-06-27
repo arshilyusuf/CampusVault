@@ -11,15 +11,49 @@ import { XIcon } from "@/components/ui/x";
 import { CheckIcon } from "@/components/ui/check";
 import { UploadIcon } from "@/components/ui/upload";
 import { PlusIcon } from "@/components/ui/plus";
+
+interface User {
+  userId: string;
+  email: string;
+  password: string;
+  role: "user" | "admin";
+  branchName: string;
+  semesterNumber: number;
+  rollNumber: string;
+  name: string;
+  yearNumber: number;
+}
+interface Request {
+  _id: string;
+  branchName: string;
+  semesterNumber: number;
+  subjectName: string;
+  uploadType: string;
+  requestingUser: string | User; 
+  status: "pending" | "rejected" | "uploaded";
+  createdAt: string;
+  updatedAt: string;
+}
+interface Contribution {
+  _id: string;
+  branchName: string;
+  semesterNumber: number;
+  subjectName: string;
+  uploadType: string;
+  userId: string 
+  pdfUrls: string[];
+  status: "pending" | "approved" | "rejected";
+  createdAt: string;
+}
 export default function AdminPage() {
   const { isAuthenticated, user } = useAuth();
   const router = useRouter();
-  const [requests, setRequests] = useState<any[]>([]);
+  const [requests, setRequests] = useState<Contribution[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedRequestId, setExpandedRequestId] = useState<string | null>(
     null
   );
-  const [userDetails, setUserDetails] = useState<Record<string, any>>({});
+  const [userDetails, setUserDetails] = useState<Record<string, User>>({});
   const [approvingContributionId, setApprovingContributionId] = useState<
     string | null
   >(null);
@@ -32,7 +66,8 @@ export default function AdminPage() {
   const [pdfFiles, setPdfFiles] = useState<File[]>([]);
   const [subjects, setSubjects] = useState<string[]>([]);
   const [isLoadingSubjects, setIsLoadingSubjects] = useState(false);
-  const [materialRequests, setMaterialRequests] = useState<any[]>();
+  const [materialRequests, setMaterialRequests] = useState<Request[]>([]);
+
   // Only allow admins
   useEffect(() => {
     if (!isAuthenticated) {
@@ -69,8 +104,9 @@ export default function AdminPage() {
         } else {
           setRequests([]);
         }
-      } catch (err) {
+      } catch (err:unknown) {
         setRequests([]);
+        console.log(err)
       } finally {
         setLoading(false);
       }
@@ -96,8 +132,9 @@ export default function AdminPage() {
         } else {
           setSubjects([]);
         }
-      } catch (error) {
+      } catch (error:unknown) {
         setSubjects([]);
+        console.log(error)
       } finally {
         setIsLoadingSubjects(false);
       }
@@ -133,22 +170,24 @@ export default function AdminPage() {
         } else {
           setMaterialRequests([]);
         }
-      } catch (err) {
+      } catch (err:unknown) {
         setMaterialRequests([]);
+        console.log(err)
       } finally {
         setLoading(false);
       }
     };
     if (user?.branchName && user?.yearNumber) fetchRequests();
   }, [user]);
-  const handleExpand = async (req: any) => {
+
+  const handleExpand = async (req: Contribution) => {
     if (expandedRequestId === req._id) {
       setExpandedRequestId(null);
       return;
     }
     setExpandedRequestId(req._id);
     // Fetch user details if not already fetched
-    const userId = req.requestingUser || req.userId;
+    const userId = req.userId ;
     if (userId && !userDetails[userId]) {
       try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/${userId}`, {
@@ -160,8 +199,9 @@ export default function AdminPage() {
           const data = await res.json();
           setUserDetails((prev) => ({ ...prev, [userId]: data }));
         }
-      } catch (e) {
+      } catch (e:unknown) {
         // ignore error
+        console.log(e)
       }
     }
   };
@@ -192,8 +232,12 @@ export default function AdminPage() {
           }`
         );
       }
-    } catch (err: any) {
-      toast.error(`Failed to approve contribution: ${err.message}`);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        toast.error(`Failed to approve contribution: ${err.message}`);
+      } else {
+        toast.error("Failed to approve contribution: Unknown error");
+      }
     } finally {
       setApprovingContributionId(null);
       setProcessingRequest(false);
@@ -226,7 +270,8 @@ export default function AdminPage() {
           }`
         );
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
+      if(err instanceof Error)
       toast.error(`Failed to reject contribution: ${err.message}`);
     } finally {
       setProcessingRequest(false);
@@ -234,8 +279,9 @@ export default function AdminPage() {
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      setPdfFiles((prevFiles) => [...prevFiles, ...Array.from(e.target.files)]);
+    const files = e.target.files;
+    if (files) {
+      setPdfFiles((prevFiles) => [...prevFiles, ...Array.from(files)]);
     }
   };
 
@@ -282,7 +328,8 @@ export default function AdminPage() {
           `Failed to upload material: ${errorData.message || "Unknown error"}`
         );
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
+      if(err instanceof Error)
       toast.error(`Failed to upload material: ${err.message}`);
     } finally {
       setProcessingRequest(false);
@@ -320,7 +367,8 @@ export default function AdminPage() {
           `Failed to add subject: ${errorData.message || "Unknown error"}`
         );
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
+      if(err instanceof Error)
       toast.error(`Failed to add subject: ${err.message}`);
     } finally {
       setProcessingRequest(false);
@@ -357,7 +405,7 @@ export default function AdminPage() {
             <ul className="space-y-4 max-h-92 overflow-y-auto">
               {requests.map((req) => {
                 const isExpanded = expandedRequestId === req._id;
-                const userId = req.requestingUser || req.userId;
+                const userId = req.userId;
                 const userInfo = userDetails[userId];
                 return (
                   <li

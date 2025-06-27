@@ -46,7 +46,7 @@ export default function ContributePage() {
     if (!isAuthenticated) {
       router.push("/login");
     }
-  },[isAuthenticated])
+  },[isAuthenticated, router])
 
   useEffect(() => {
     const fetchSubjects = async () => {
@@ -67,8 +67,9 @@ export default function ContributePage() {
           
           setSubjects([]);
         }
-      } catch (error) {
+      } catch (error:unknown) {
         setSubjects([]);
+        console.log(error)
       } finally {
         setIsLoadingSubjects(false);
       }
@@ -78,8 +79,9 @@ export default function ContributePage() {
   }, [branchName, semesterNumber]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      setPdfFiles((prev) => [...prev, ...Array.from(e.target.files)]);
+    const files = e.target.files;
+    if (files) {
+      setPdfFiles((prev) => [...prev, ...Array.from(files)]);
     }
   };
 
@@ -133,11 +135,18 @@ export default function ContributePage() {
           errorData.message || "Failed to submit contribution request"
         );
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Contribution error:", error);
-      console.error("Contribution error details:", error.message, error.stack); // Log more details
+    
+      if (error instanceof Error) {
+        console.error("Contribution error details:", error.message, error.stack);
+      } else {
+        console.error("Unknown error type:", error);
+      }
+    
       toast.error("An unexpected error occurred");
-    } finally {
+    }
+     finally {
       setIsSubmitting(false);
     }
   };

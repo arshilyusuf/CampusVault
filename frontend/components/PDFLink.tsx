@@ -14,13 +14,30 @@ const uploadTypeMap = {
   notes: "Notes",
   other: "Other",
 };
+interface Subject {
+  _id: string;
+  name: string;
+  semesterNumber: number;
+  branchName: string;
+  midsem: string[];
+  endsem: string[];
+  notes: string[];
+  lectures: string[];
+  other: string[];
+}
+type UploadType = "midsem" | "endsem" | "notes" | "lectures" | "other";
 
-export default function PDFLink({ subject, uploadtype }) {
+interface PDFLinkProps {
+  subject: Subject;
+  uploadtype: UploadType;
+}
+
+export default function PDFLink({ subject, uploadtype }: PDFLinkProps) {
   const { isAuthenticated, user } = useAuth();
   const [showContributeTooltip, setShowContributeTooltip] = useState(false);
   const [showRequestTooltip, setShowRequestTooltip] = useState(false);
   const [showDeleteToolTip, setShowDeleteToolTip] = useState(false);
-  const [pendingDelete, setPendingDelete] = useState<string | null>(null); 
+  const [pendingDelete, setPendingDelete] = useState<string | null>(null);
   const [isRequesting, setIsRequesting] = useState(false);
   const router = useRouter();
 
@@ -44,13 +61,13 @@ export default function PDFLink({ subject, uploadtype }) {
     }
     const params = new URLSearchParams({
       branchName: subject.branchName,
-      semesterNumber: subject.semesterNumber,
+      semesterNumber: subject.semesterNumber.toString(),
       subjectName: subject.name,
       uploadType: uploadtype,
     });
     router.push(`/contribute?${params.toString()}`);
   };
-  const handleDelete = async (link) => {
+  const handleDelete = async (link:string) => {
     if (!isAuthenticated) {
       router.push("/login");
       return;
@@ -86,7 +103,7 @@ export default function PDFLink({ subject, uploadtype }) {
           `Delete Request failed: ${errorData.message || response.statusText}`
         );
       }
-    } catch (e) {
+    } catch (error) {
       console.error("Request error:", error);
       toast.error("An error occurred while submitting the request.");
     } finally {

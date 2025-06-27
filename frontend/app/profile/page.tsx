@@ -26,8 +26,9 @@ export default function Page() {
       await logout();
       router.push("/")
 
-    }catch(err){
-      toast.error(err)
+    }catch(err:unknown){
+      if(err instanceof Error)
+      toast.error(err.message)
     }
   }
   return (

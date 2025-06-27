@@ -16,9 +16,9 @@ const MaterialPage = () => {
   const semesterNumber = semester as string;
   const [subjects, setSubjects] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [error, setError] = useState("");
 
-  
   useEffect(() => {
     if (branch) {
       setBranchName(decodeURIComponent(branch as string).replace(/\+/g, " "));
@@ -29,7 +29,7 @@ const MaterialPage = () => {
     if (branchName && semesterNumber) {
       const fetchData = async () => {
         setLoading(true);
-        setError(null);
+        setError("");
         try {
           const response = await fetch(
             `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/public/subjects/${branchName}/${semesterNumber}`
@@ -40,8 +40,8 @@ const MaterialPage = () => {
 
           const data = await response.json();
           setSubjects(data.subjects);
-        } catch (e) {
-          setError(e.message);
+        } catch (e: unknown) {
+          if (e instanceof Error) setError(e.message);
         } finally {
           setLoading(false);
         }

@@ -27,11 +27,11 @@ export default function Subject({ subject }) {
           )}/${semesterNumber}/${encodeURIComponent(subjectName)}`
         );
 
-        console.log(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/public/subjects/${encodeURIComponent(
-            branchName
-          )}/${semesterNumber}/${encodeURIComponent(subjectName)}`
-        );
+        // console.log(
+        //   `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/public/subjects/${encodeURIComponent(
+        //     branchName
+        //   )}/${semesterNumber}/${encodeURIComponent(subjectName)}`
+        // );
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }

@@ -25,21 +25,21 @@ export default function LoginPage() {
     setIsFormFilled(email !== "" && password !== "");
   }, [email, password]);
 
-  const handleLogin = async (e) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const success = await login(email, password); 
+      const success = await login(email, password);
 
       if (success) {
-        toast.success('Login successful!');
-        router.push('/vault'); // Redirect on success
+        toast.success("Login successful!");
+        router.push("/vault"); // Redirect on success
       } else {
-        toast.error('Login failed. Please check your credentials.');
+        toast.error("Login failed. Please check your credentials.");
       }
     } catch (error) {
       console.error("Login error:", error);
-      toast.error('An unexpected error occurred');
+      toast.error("An unexpected error occurred");
     } finally {
       setIsLoading(false);
     }
@@ -47,7 +47,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-[80vh] flex items-center justify-center">
-      <form className="bg-[var(--black)]/30 dark:bg-black/30 shadow-xl rounded-2xl px-8 py-10 w-full max-w-md flex flex-col gap-6 [40px] backdrop-blur-3xl">
+      <form onSubmit={handleLogin} className="bg-[var(--black)]/30 dark:bg-black/30 shadow-xl rounded-2xl px-8 py-10 w-full max-w-md flex flex-col gap-6 [40px] backdrop-blur-3xl">
         <div className="text-3xl flex flex-col items-center font-bold text-center text-[var(--color-4)] gap-6">
           <UserIcon
             size={50}
@@ -89,7 +89,7 @@ export default function LoginPage() {
           />
         </div>
         
-          <Button onClick={handleLogin} buttonClassName="w-full" disabled={!isFormFilled || isLoading}>
+          <Button type="submit" buttonClassName="w-full" disabled={!isFormFilled || isLoading}>
             {!isLoading ? 'Sign In' : 'Signing In...'}
           </Button>
         
