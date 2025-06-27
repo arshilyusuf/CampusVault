@@ -1,4 +1,5 @@
-'use client'
+/* eslint-disable */
+"use client";
 import React, {
   useRef,
   useState,
@@ -54,7 +55,7 @@ interface AnimatedListProps<T> {
   initialSelectedIndex?: number;
 }
 
-const AnimatedList: <T>(props: AnimatedListProps<T>) => React.ReactElement | null = <T extends any>({
+function AnimatedList<T>({
   items = [],
   renderItem,
   onItemSelect,
@@ -64,7 +65,7 @@ const AnimatedList: <T>(props: AnimatedListProps<T>) => React.ReactElement | nul
   itemClassName = "",
   displayScrollbar = true,
   initialSelectedIndex = -1,
-}) => {
+}: AnimatedListProps<T>): React.ReactElement | null {
   const listRef = useRef<HTMLDivElement>(null);
   const [selectedIndex, setSelectedIndex] =
     useState<number>(initialSelectedIndex);

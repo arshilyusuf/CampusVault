@@ -6,7 +6,7 @@ import Button from "@/components/Button";
 import { toast } from "react-toastify";
 import { AnimatePresence, motion } from "framer-motion";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
-import { semesters, uploadTypes } from "../contribute/page";
+import { semesters, uploadTypes } from "@/lib/constants";
 import { XIcon } from "@/components/ui/x";
 import { CheckIcon } from "@/components/ui/check";
 import { UploadIcon } from "@/components/ui/upload";
@@ -62,7 +62,9 @@ export default function AdminPage() {
   const [newSubjectSemester, setNewSubjectSemester] = useState("");
   const [semesterNumber, setSemesterNumber] = useState(semesters[0]);
   const [subjectName, setSubjectName] = useState("");
-  const [uploadType, setUploadType] = useState(uploadTypes[0]);
+  type UploadType = "midsem" | "endsem" | "notes" | "lectures" | "other";
+  const [uploadType, setUploadType] = useState<UploadType>("midsem");
+
   const [pdfFiles, setPdfFiles] = useState<File[]>([]);
   const [subjects, setSubjects] = useState<string[]>([]);
   const [isLoadingSubjects, setIsLoadingSubjects] = useState(false);
@@ -300,7 +302,7 @@ export default function AdminPage() {
     pdfFiles.forEach((file) => {
       formData.append("pdfFiles", file);
     });
-    formData.append("semesterNumber", semesterNumber);
+    formData.append("semesterNumber", semesterNumber.toString());
     formData.append("branchName", user?.branchName || "");
     formData.append("subjectName", subjectName);
     formData.append("uploadType", uploadType);
@@ -382,7 +384,7 @@ export default function AdminPage() {
       </h1>
       <div
         className="grid w-full grid-cols-4 grid-rows-6 sm:grid-rows-4 gap-8"
-        style={{ minHeight: "60vh"}}
+        style={{ minHeight: "60vh" }}
       >
         {/* Contribution Requests: spans 2 columns in row 1 */}
         <div className="bg-black rounded-2xl p-6 shadow-lg backdrop-blur-md flex flex-col col-span-4 row-span-2 col-start-1 row-start-1">
@@ -579,7 +581,7 @@ export default function AdminPage() {
             Semester:
             <select
               value={semesterNumber}
-              onChange={(e) => setSemesterNumber(e.target.value)}
+              onChange={(e) => setSemesterNumber(Number(e.target.value))}
               className="mt-1 block w-full rounded-md border-gray-300 font-semibold shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white/20 p-3"
             >
               {semesters.map((semester) => (
@@ -613,7 +615,7 @@ export default function AdminPage() {
             Upload Type:
             <select
               value={uploadType}
-              onChange={(e) => setUploadType(e.target.value)}
+              onChange={(e) => setUploadType(e.target.value as UploadType)}
               className="mt-1 block w-full rounded-md border-gray-300 font-semibold shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white/20 p-3"
             >
               {uploadTypes.map((type) => (
