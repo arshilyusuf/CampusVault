@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node api/index.js"
   },
   "keywords": [],
   "author": "",
@@ -21,7 +22,8 @@
     "multer": "^2.0.0",
     "multer-storage-cloudinary": "^4.0.0",
     "node-fetch": "^3.3.2",
-    "nodemailer": "^7.0.3"
+    "nodemailer": "^7.0.3",
+    "serverless-http": "^3.2.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"
