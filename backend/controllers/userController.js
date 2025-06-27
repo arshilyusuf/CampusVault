@@ -3,7 +3,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const Contribution = require("../models/Contribution"); 
 const cloudinary = require("../utils/cloudinary"); 
-
+const nodemailer = require("nodemailer")
 const registerUser = async (req, res) => {
   try {
     const {
@@ -35,7 +35,34 @@ const registerUser = async (req, res) => {
     });
 
     await user.save();
+    
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
 
+    const mailOptions = {
+      from: `"CampusVault" <${process.env.EMAIL_USER}>`,
+      to: "campusvaultnitrr@gmail.com",
+      subject: "📬 New User Registration",
+      html: `
+        <h3>A new user has registered</h3>
+        <ul>
+          <li><strong>Name:</strong> ${name}</li>
+          <li><strong>Email:</strong> ${email}</li>
+          <li><strong>Roll Number:</strong> ${rollNumber}</li>
+          <li><strong>Branch:</strong> ${branchName}</li>
+          <li><strong>Semester:</strong> ${semesterNumber}</li>
+          <li><strong>Year:</strong> ${yearNumber}</li>
+        </ul>
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
+    
     // Return JWT
     const payload = {
       user: {
