@@ -52,9 +52,11 @@ export default function AdminPage() {
       setLoading(true);
       try {
         const res = await fetch(
-          `http://localhost:8000/api/admin/contributions/${encodeURIComponent(
-            user.branchName
-          )}/${user.yearNumber}`,
+          `${
+            process.env.NEXT_PUBLIC_BACKEND_URL
+          }/api/admin/contributions/${encodeURIComponent(user.branchName)}/${
+            user.yearNumber
+          }`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -82,7 +84,7 @@ export default function AdminPage() {
       setIsLoadingSubjects(true);
       try {
         const response = await fetch(
-          `http://localhost:8000/api/public/subjects/${encodeURIComponent(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/public/subjects/${encodeURIComponent(
             user?.branchName || ""
           )}/${semesterNumber}`
         );
@@ -110,12 +112,12 @@ export default function AdminPage() {
       setLoading(true);
       try {
         console.log(
-          `http://localhost:8000/api/requests/${encodeURIComponent(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/requests/${encodeURIComponent(
             user.branchName
           )}/${user.yearNumber}`
         );
         const res = await fetch(
-          `http://localhost:8000/api/requests/${encodeURIComponent(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/requests/${encodeURIComponent(
             user.branchName
           )}/${user.yearNumber}`,
           {
@@ -149,7 +151,7 @@ export default function AdminPage() {
     const userId = req.requestingUser || req.userId;
     if (userId && !userDetails[userId]) {
       try {
-        const res = await fetch(`http://localhost:8000/api/users/${userId}`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/${userId}`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
@@ -169,7 +171,7 @@ export default function AdminPage() {
     setProcessingRequest(true);
     try {
       const res = await fetch(
-        `http://localhost:8000/api/admin/approveContribution/${id}`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/approveContribution/${id}`,
         {
           method: "GET",
           headers: {
@@ -203,7 +205,7 @@ export default function AdminPage() {
 
     try {
       const res = await fetch(
-        `http://localhost:8000/api/admin/rejectContribution/${id}`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/rejectContribution/${id}`,
         {
           method: "GET",
           headers: {
@@ -263,7 +265,7 @@ export default function AdminPage() {
 
     try {
       setProcessingRequest(true);
-      const res = await fetch("http://localhost:8000/api/admin/uploadPdf", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/uploadPdf`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -295,7 +297,7 @@ export default function AdminPage() {
 
     try {
       setProcessingRequest(true);
-      const res = await fetch("http://localhost:8000/api/admin/addSubject", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/addSubject`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -390,12 +392,12 @@ export default function AdminPage() {
                       {isExpanded && (
                         <motion.div
                           initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: "auto", opacity: 1 }}
+                          animate={{ height: "100%", opacity: 1 }}
                           exit={{ height: 0, opacity: 0 }}
                           transition={{ duration: 0.3 }}
-                          className="overflow-hidden flex flex-col items-center mt-4 bg-white/10 rounded-lg p-4"
+                          className="h-full flex flex-col items-center mt-4 bg-white/10 rounded-lg p-4"
                         >
-                          <div className="flex gap-4 w-full">
+                          <div className="flex flex-col sm:flex-row gap-4 w-full">
                             <div className="mb-5 w-[70%] text-[0.5rem]">
                               <div className="font-semibold text-xl text-[var(--color-3)]">
                                 Contribution Details
@@ -682,7 +684,7 @@ export default function AdminPage() {
                       onClick={async () => {
                         try {
                           const res = await fetch(
-                            `http://localhost:8000/api/requests/deleteRequestAndNotify/${req._id}`,
+                            `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/requests/deleteRequestAndNotify/${req._id}`,
                             {
                               method: "DELETE",
 

@@ -13,8 +13,13 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const [isFormFilled, setIsFormFilled] = useState(false);
-  const { login } = useAuth();
+  const { login, isAuthenticated } = useAuth();
 
+  useEffect(()=>{
+    if(isAuthenticated){
+      router.push("/")
+    }
+  })
 
   useEffect(() => {
     setIsFormFilled(email !== "" && password !== "");
@@ -24,7 +29,7 @@ export default function LoginPage() {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const success = await login(email, password); // Await the login function and store the result
+      const success = await login(email, password); 
 
       if (success) {
         toast.success('Login successful!');
@@ -84,7 +89,7 @@ export default function LoginPage() {
           />
         </div>
         
-          <Button onClick={handleLogin} buttonClassName="w-full" disabled={!isFormFilled}>
+          <Button onClick={handleLogin} buttonClassName="w-full" disabled={!isFormFilled || isLoading}>
             {!isLoading ? 'Sign In' : 'Signing In...'}
           </Button>
         

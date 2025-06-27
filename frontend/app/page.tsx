@@ -25,7 +25,7 @@ export default function Home() {
   return (
     <div className="flex flex-col items-center justify-center">
       {/* 🔥 Responsive wrapper */}
-      <div className="flex flex-col sm:flex-row items-center sm:items-start justify-between mb-[6rem] sm:mt-[6rem] mt-[4rem] gap-10 px-5 sm:px-0">
+      <div className="flex flex-col sm:flex-row items-center sm:items-start justify-between mb-[6rem] sm:mt-[6rem] mt-[6rem] gap-10 px-5 sm:px-0">
         {/* 🪄 Heading block */}
         <div className="flex flex-col items-start justify-center gap-10 w-full sm:w-auto">
           <div className="text-[3.4rem] sm:text-[6rem] font-[800] tracking-[-0.1rem] sm:tracking-[-0.3rem] leading-[2.6rem] sm:leading-[5rem] w-full sm:w-[40rem] text-[var(--color-4)] flex flex-col items-center justify-center sm:flex-none sm:items-start sm:justify-start">
@@ -53,7 +53,7 @@ export default function Home() {
                 threshold={0.1}
                 rootMargin="-100px"
                 textAlign={textAlign}
-                className="text-[3.2rem]"
+                className="text-[3.2rem] sm:text-[6rem]"
               />
             </div>
             <SplitText

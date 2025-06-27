@@ -1,6 +1,6 @@
 const axios = require("axios");
 
-const API_BASE = "http://localhost:8000/api/admin"; // Update this if your port or base path differs
+const API_BASE = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin`; // Update this if your port or base path differs
 
 const branches = [
   "Computer Science and Engineering",

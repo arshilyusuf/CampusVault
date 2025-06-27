@@ -7,7 +7,6 @@ import "react-toastify/dist/ReactToastify.css";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 
-//specify upload type type
 const uploadTypeMap = {
   endsem: "End Semester",
   midsem: "Mid Semester",
@@ -62,7 +61,7 @@ export default function PDFLink({ subject, uploadtype }) {
       const semesterNumber = subject.semesterNumber;
       const subjectName = subject.name;
 
-      const url = `http://localhost:8000/api/admin/deleteMaterial`;
+      const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/deleteMaterial`;
       const requestData = {
         branchName,
         semesterNumber,
@@ -110,7 +109,7 @@ export default function PDFLink({ subject, uploadtype }) {
       const encodedBranchName = encodeURIComponent(branchName);
       const encodedSubjectName = encodeURIComponent(subjectName);
 
-      const url = `http://localhost:8000/api/requests/${encodedBranchName}/${semesterNumber}/${encodedSubjectName}/${uploadtype}`;
+      const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/requests/${encodedBranchName}/${semesterNumber}/${encodedSubjectName}/${uploadtype}`;
 
       const requestData = {
         requestingUser: user?.id, // Use user ID from AuthContext

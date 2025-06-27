@@ -17,6 +17,8 @@ const MaterialPage = () => {
   const [subjects, setSubjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  
   useEffect(() => {
     if (branch) {
       setBranchName(decodeURIComponent(branch as string).replace(/\+/g, " "));
@@ -30,7 +32,7 @@ const MaterialPage = () => {
         setError(null);
         try {
           const response = await fetch(
-            `http://127.0.0.1:8000/api/public/subjects/${branchName}/${semesterNumber}`
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/public/subjects/${branchName}/${semesterNumber}`
           );
           if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);

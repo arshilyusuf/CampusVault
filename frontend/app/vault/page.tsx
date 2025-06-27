@@ -4,7 +4,6 @@ import Button from "@/components/Button";
 import { useRouter } from "next/navigation";
 import { SearchIcon } from "@/components/ui/search";
 import { LoaderPinwheelIcon } from "@/components/ui/loader-pinwheel";
-
 const branches = [
   "Select Branch",
   "Computer Science and Engineering",
@@ -25,7 +24,7 @@ export default function VaultPage() {
   const router = useRouter();
 
   return (
-    <div className="flex flex-col items-center min-h-[80vh] py-12 gap-10 relative">
+    <div className="flex flex-col items-center min-h-[80vh]  py-12 gap-10 relative">
       {isLoading && (
         <div className="fixed top-0 left-0 w-full h-full flex flex-col items-center justify-center bg-black/50 z-50">
           <LoaderPinwheelIcon color="white" />
@@ -34,7 +33,7 @@ export default function VaultPage() {
       <h1 className="text-6xl md:text-7xl font-extrabold text-center text-[var(--color-4)] mb-4 tracking-tight drop-shadow-white">
         The Vault
       </h1>
-      <div className="p-5 sm:p-10  bg-black/20 rounded-3xl flex flex-col gap-3 backdrop-blur-2xl">
+      <div className="p-5  sm:p-10  bg-black/20 rounded-3xl flex flex-col gap-3 backdrop-blur-2xl">
         <h2 className="text-2xl md:text-2xl font-bold text-center text-[#f2f2f2] tracking-tight">
           Search for your required material by your branch and semester
         </h2>
@@ -43,6 +42,7 @@ export default function VaultPage() {
           onSubmit={(e) => {
             e.preventDefault();
             setIsLoading(true);
+            
             router.push(`/material/${encodeURIComponent(branch)}/${semester}`);
           }}
         >

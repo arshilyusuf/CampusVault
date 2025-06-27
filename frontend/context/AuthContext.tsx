@@ -41,7 +41,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const token = localStorage.getItem('token');
       if (token) {
         try {
-          const response = await fetch("http://localhost:8000/api/auth/isAuthenticated", {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/isAuthenticated`, {
             headers: {
               "Authorization": `Bearer ${token}`,
             },
@@ -75,7 +75,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const login = useCallback(async (email: string, password: string): Promise<boolean> => { // Add return type to function signature
     try {
 
-      const response = await fetch("http://localhost:8000/api/auth/login", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -89,13 +89,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         localStorage.setItem('token', data.token);
         setIsAuthenticated(true);
         setUser(data.user);
-        return true; // Return true on successful login
+        return true; 
       } else {
         setIsAuthenticated(false);
         setUser(null);
         localStorage.removeItem('token');
         console.error("Login failed");
-        return false; // Return false on failed login
+        return false; 
       }
     } catch (error) {
       console.error("Login error:", error);

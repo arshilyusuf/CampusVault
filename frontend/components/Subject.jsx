@@ -22,13 +22,13 @@ export default function Subject({ subject }) {
         const semesterNumber = subject.semesterNumber;
         const subjectName = subject.name;
         const response = await fetch(
-          `http://127.0.0.1:8000/api/public/subjects/${encodeURIComponent(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/public/subjects/${encodeURIComponent(
             branchName
           )}/${semesterNumber}/${encodeURIComponent(subjectName)}`
         );
 
         console.log(
-          `http://127.0.0.1:8000/api/public/subjects/${encodeURIComponent(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/public/subjects/${encodeURIComponent(
             branchName
           )}/${semesterNumber}/${encodeURIComponent(subjectName)}`
         );

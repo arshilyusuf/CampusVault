@@ -37,7 +37,7 @@ const [processing, setProcessing] = useState(false);
     setProcessing(true)
     try {
 
-      const res = await fetch("http://localhost:8000/api/users/register", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -67,8 +67,8 @@ const [processing, setProcessing] = useState(false);
 
   return (
     <div className="w-full min-h-[80vh] flex flex-col sm:flex-row p-4 sm:p-10">
-      <div className="w-full sm:w-1/2 h-[15rem] sm:h-full bg-black/70 relative overflow-hidden rounded-t-3xl sm:rounded-none">
-        <div className="absolute inset-0 bg-gradient-to-tr from-black via-transparent to-transparent z-10 pointer-events-none"></div>
+      <div className="w-full sm:w-1/2 h-[15rem] sm:h-auto bg-black/70 relative overflow-hidden rounded-t-3xl sm:rounded-none sm:rounded-l-3xl">
+        {/* <div className="absolute inset-0 bg-gradient-to-tr from-black via-transparent to-transparent z-10 pointer-events-none"></div> */}
         <Silk
           speed={5}
           scale={1}
@@ -185,6 +185,8 @@ const [processing, setProcessing] = useState(false);
               type="number"
               id="yearNumber"
               name="yearNumber"
+              min={1}
+              max={4}
               value={formData.yearNumber}
               onChange={handleChange}
               className="border-2 border-black rounded-[0.5rem] px-3 py-2"
@@ -215,6 +217,9 @@ const [processing, setProcessing] = useState(false);
             </button>
           </div>
         </form>
+        <p className="ml-5">
+          Already have an account ? <a href="/login">Login</a>
+        </p>
       </div>
     </div>
   );

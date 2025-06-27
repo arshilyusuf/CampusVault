@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
-import { useRouter, useSearchParams } from "next/navigation"; // <-- import useSearchParams
+import { useRouter, useSearchParams } from "next/navigation"; 
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Button from "@/components/Button";
@@ -25,7 +25,7 @@ export default function ContributePage() {
   const { user } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams(); // <-- get search params
-
+  const {isAuthenticated} = useAuth();
   // Read params from URL
   const initialBranchName = searchParams.get("branchName") || branches[0];
   const initialSemesterNumber = searchParams.get("semesterNumber") || semesters[0];
@@ -42,15 +42,22 @@ export default function ContributePage() {
   const [subjects, setSubjects] = useState<string[]>([]);
   const [isLoadingSubjects, setIsLoadingSubjects] = useState(false);
 
+  useEffect(()=>{
+    if (!isAuthenticated) {
+      router.push("/login");
+    }
+  },[isAuthenticated])
+
   useEffect(() => {
     const fetchSubjects = async () => {
       setIsLoadingSubjects(true);
       try {
         const response = await fetch(
-          `http://localhost:8000/api/public/subjects/${encodeURIComponent(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/public/subjects/${encodeURIComponent(
             branchName
           )}/${semesterNumber}`
         );
+        
         if (response.ok) {
           const data = await response.json();
           setSubjects(
@@ -80,6 +87,8 @@ export default function ContributePage() {
     e.preventDefault();
     setIsSubmitting(true);
 
+    
+
     try {
       const formData = new FormData();
       formData.append("branchName", branchName);
@@ -98,7 +107,7 @@ export default function ContributePage() {
       }
 
       const response = await fetch(
-        "http://localhost:8000/api/users/contribute",
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/contribute`,
         {
           method: "POST",
           headers: {
